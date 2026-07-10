@@ -56,6 +56,17 @@ button{border:none;border-radius:999px;background:var(--corteza);color:white;pad
 .full{grid-column:1/-1}
 .toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
 .toolbar select,.toolbar input{min-width:170px}
+.multi-filter{position:relative;min-width:210px}
+.multi-filter>summary{list-style:none;border:1px solid rgba(105,97,88,.25);border-radius:10px;padding:10px 36px 10px 12px;background:white;cursor:pointer;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.multi-filter>summary::-webkit-details-marker{display:none}
+.multi-filter>summary:after{content:"▾";position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.multi-filter[open]>summary:after{content:"▴"}
+.multi-options{position:absolute;z-index:50;top:calc(100% + 5px);left:0;min-width:260px;max-height:290px;overflow:auto;background:#fff;border:1px solid rgba(105,97,88,.25);border-radius:12px;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,.16)}
+.multi-actions{display:flex;gap:6px;padding:3px 3px 8px;position:sticky;top:-8px;background:#fff;z-index:2}
+.multi-actions button{padding:6px 10px;font-size:11px;background:var(--corteza)}
+.multi-option{display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:7px;cursor:pointer;font-size:13px}
+.multi-option:hover{background:#f3efdf}
+.multi-option input{min-width:0;margin:0;accent-color:var(--verde)}
 .filter-info{font-size:12px;color:var(--muted);margin:-4px 0 10px}
 .grupo-empresa td{background:#f3efdf;color:var(--corteza);font-weight:800;text-transform:uppercase;border-top:2px solid #e0d7bd}
 select,input{border:1px solid rgba(105,97,88,.25);border-radius:10px;padding:10px;background:white}
@@ -500,12 +511,20 @@ footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
     <div class="card">
       <h2>Producción diaria por Team</h2>
       <div class="toolbar">
-        <select id="filtroEmpresa">
-          <option value="Todos">Todas las empresas</option>
-        </select>
-        <select id="filtroTeam">
-          <option value="Todos">Todos los teams</option>
-        </select>
+        <details class="multi-filter" id="filtroEmpresaBox">
+          <summary id="filtroEmpresaResumen">Todas las empresas</summary>
+          <div class="multi-options">
+            <div class="multi-actions"><button type="button" data-multi-action="all" data-target="filtroEmpresaOpciones">Todas</button><button type="button" data-multi-action="none" data-target="filtroEmpresaOpciones">Limpiar</button></div>
+            <div id="filtroEmpresaOpciones"></div>
+          </div>
+        </details>
+        <details class="multi-filter" id="filtroTeamBox">
+          <summary id="filtroTeamResumen">Todos los teams</summary>
+          <div class="multi-options">
+            <div class="multi-actions"><button type="button" data-multi-action="all" data-target="filtroTeamOpciones">Todos</button><button type="button" data-multi-action="none" data-target="filtroTeamOpciones">Limpiar</button></div>
+            <div id="filtroTeamOpciones"></div>
+          </div>
+        </details>
         <select id="filtroEstado">
           <option value="Todos">Todos los estados</option>
           <option value="Cumple">Cumple</option>
@@ -789,35 +808,52 @@ function empresaDeTeam(team){
   const fila=equipos.find(x=>normalizarTxt(x.team)===normalizarTxt(team));
   return fila ? fila.emsefor : "";
 }
+function valoresSeleccionados(contenedorId){
+  return [...document.querySelectorAll(`#${contenedorId} input[type="checkbox"]:checked`)].map(x=>x.value);
+}
+function actualizarResumenMulti(contenedorId,resumenId,todosTexto,singularTexto,pluralTexto){
+  const total=document.querySelectorAll(`#${contenedorId} input[type="checkbox"]`).length;
+  const seleccionados=valoresSeleccionados(contenedorId);
+  const el=document.getElementById(resumenId);
+  if(seleccionados.length===0 || seleccionados.length===total) el.textContent=todosTexto;
+  else if(seleccionados.length===1) el.textContent=`${singularTexto}: ${seleccionados[0]}`;
+  else el.textContent=`${seleccionados.length} ${pluralTexto}`;
+}
+function crearOpcionesMulti(contenedorId,valores,seleccionPrevia){
+  const cont=document.getElementById(contenedorId);
+  const mantener=new Set(seleccionPrevia || []);
+  cont.innerHTML=valores.map(v=>{
+    const checked=mantener.size===0 || mantener.has(v) ? "checked" : "";
+    return `<label class="multi-option"><input type="checkbox" value="${v.replace(/"/g,'&quot;')}" ${checked}><span>${v}</span></label>`;
+  }).join("");
+}
 function llenarFiltros(){
-  const empSel=document.getElementById("filtroEmpresa");
-  const teamSel=document.getElementById("filtroTeam");
-  const empActual=empSel.value || "Todos";
-  const teamActual=teamSel.value || "Todos";
-
+  const empresasPrevias=valoresSeleccionados("filtroEmpresaOpciones");
+  const teamsPrevios=valoresSeleccionados("filtroTeamOpciones");
   const empresas=[...new Set(equipos.map(x=>x.emsefor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
-  empSel.innerHTML='<option value="Todos">Todas las empresas</option>' + empresas.map(e=>`<option value="${e}">${e}</option>`).join("");
-  if(empresas.includes(empActual)) empSel.value=empActual;
 
-  const empresaFiltro=empSel.value;
+  crearOpcionesMulti("filtroEmpresaOpciones",empresas,empresasPrevias);
+  const empresasSel=valoresSeleccionados("filtroEmpresaOpciones");
+  const filtrarEmpresas=empresasSel.length>0 && empresasSel.length<empresas.length;
   const teams=[...new Set(equipos
-    .filter(x=>empresaFiltro==="Todos" || x.emsefor===empresaFiltro)
-    .map(x=>x.team)
-    .filter(Boolean))]
-    .sort((a,b)=>a.localeCompare(b,"es", {numeric:true}));
-
-  teamSel.innerHTML='<option value="Todos">Todos los teams</option>' + teams.map(e=>`<option value="${e}">${e}</option>`).join("");
-  if(teams.includes(teamActual)) teamSel.value=teamActual;
+    .filter(x=>!filtrarEmpresas || empresasSel.includes(x.emsefor))
+    .map(x=>x.team).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"es",{numeric:true}));
+  crearOpcionesMulti("filtroTeamOpciones",teams,teamsPrevios);
+  actualizarResumenMulti("filtroEmpresaOpciones","filtroEmpresaResumen","Todas las empresas","Empresa","empresas seleccionadas");
+  actualizarResumenMulti("filtroTeamOpciones","filtroTeamResumen","Todos los teams","Team","teams seleccionados");
 }
 function filtrarEquipos(){
-  const empresa=document.getElementById("filtroEmpresa").value;
-  const team=document.getElementById("filtroTeam").value;
+  const empresasSel=valoresSeleccionados("filtroEmpresaOpciones");
+  const teamsSel=valoresSeleccionados("filtroTeamOpciones");
+  const totalEmpresas=document.querySelectorAll('#filtroEmpresaOpciones input[type="checkbox"]').length;
+  const totalTeams=document.querySelectorAll('#filtroTeamOpciones input[type="checkbox"]').length;
   const estado=document.getElementById("filtroEstado").value;
   const q=normalizarTxt(document.getElementById("buscar").value);
 
   let data=equipos.filter(x=>
-    (empresa==="Todos" || x.emsefor===empresa) &&
-    (team==="Todos" || x.team===team) &&
+    (empresasSel.length===0 || empresasSel.length===totalEmpresas || empresasSel.includes(x.emsefor)) &&
+    (teamsSel.length===0 || teamsSel.length===totalTeams || teamsSel.includes(x.team)) &&
     (estado==="Todos" || x.estado===estado) &&
     (q==="" || normalizarTxt(x.team).includes(q) || normalizarTxt(x.emsefor).includes(q))
   );
@@ -856,7 +892,7 @@ function renderResumenEjecutivo(){
   card.classList.add(capacidadDia>0 ? claseCumplimientoPct(cumplimiento) : "gray");
 
   const estadoTxt = cumplimiento>=100 ? "sobre la meta diaria" : cumplimiento>=95 ? "cerca de la meta diaria" : "bajo la meta diaria";
-  document.getElementById("resumenEjecutivo").innerHTML = `📌 <b>Lectura ejecutiva:</b> Constitución produjo <b>${fmt(produccionDia)} m³</b>, equivalente a <b>${fmt1(cumplimiento)}%</b> de la capacidad diaria (${fmt(capacidadDia)} m³), quedando <b>${estadoTxt}</b>. El mejor desempeño del día fue <b>${mejor.team}</b> y el principal foco por tiempos perdidos fue <b>${topTp.team}</b> con <b>${fmt(topTp.minutos)} min</b>.`;
+  document.getElementById("resumenEjecutivo").innerHTML = `📌 <b>Lectura ejecutiva:</b> CEMA NORTE produjo <b>${fmt(produccionDia)} m³</b>, equivalente a <b>${fmt1(cumplimiento)}%</b> de la capacidad diaria (${fmt(capacidadDia)} m³), quedando <b>${estadoTxt}</b>. El mejor desempeño del día fue <b>${mejor.team}</b> y el principal foco por tiempos perdidos fue <b>${topTp.team}</b> con <b>${fmt(topTp.minutos)} min</b>.`;
 }
 
 function renderTeam(){
@@ -881,13 +917,15 @@ function renderTeam(){
   document.getElementById("tablaTeam").innerHTML=html || `<tr><td colspan="6">Sin registros para los filtros seleccionados.</td></tr>`;
 }
 function renderAcum(){
-  const empresa=document.getElementById("filtroEmpresa").value;
-  const teamFiltro=document.getElementById("filtroTeam").value;
+  const empresasSel=valoresSeleccionados("filtroEmpresaOpciones");
+  const teamsSel=valoresSeleccionados("filtroTeamOpciones");
+  const totalEmpresas=document.querySelectorAll('#filtroEmpresaOpciones input[type="checkbox"]').length;
+  const totalTeams=document.querySelectorAll('#filtroTeamOpciones input[type="checkbox"]').length;
   const q=normalizarTxt(document.getElementById("buscar").value);
 
   let data=acumulado.map(x=>({...x, emsefor: empresaDeTeam(x.team)})).filter(x=>
-    (empresa==="Todos" || x.emsefor===empresa) &&
-    (teamFiltro==="Todos" || x.team===teamFiltro) &&
+    (empresasSel.length===0 || empresasSel.length===totalEmpresas || empresasSel.includes(x.emsefor)) &&
+    (teamsSel.length===0 || teamsSel.length===totalTeams || teamsSel.includes(x.team)) &&
     (q==="" || normalizarTxt(x.team).includes(q) || normalizarTxt(x.emsefor).includes(q))
   );
 
@@ -1176,8 +1214,49 @@ function mensaje(txt){
   box.textContent=txt;
   box.style.display="block";
 }
-document.getElementById("filtroEmpresa").onchange=function(){llenarFiltros();renderTeam();renderAcum();};
-document.getElementById("filtroTeam").onchange=function(){renderTeam();renderAcum();};
+document.getElementById("filtroEmpresaOpciones").addEventListener("change",function(){
+  const empresasSel=valoresSeleccionados("filtroEmpresaOpciones");
+  const teamsPrevios=valoresSeleccionados("filtroTeamOpciones");
+  const totalEmpresas=document.querySelectorAll('#filtroEmpresaOpciones input[type="checkbox"]').length;
+  const filtrar=empresasSel.length>0 && empresasSel.length<totalEmpresas;
+  const teams=[...new Set(equipos.filter(x=>!filtrar || empresasSel.includes(x.emsefor)).map(x=>x.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es",{numeric:true}));
+  crearOpcionesMulti("filtroTeamOpciones",teams,teamsPrevios);
+  actualizarResumenMulti("filtroEmpresaOpciones","filtroEmpresaResumen","Todas las empresas","Empresa","empresas seleccionadas");
+  actualizarResumenMulti("filtroTeamOpciones","filtroTeamResumen","Todos los teams","Team","teams seleccionados");
+  renderTeam();renderAcum();
+});
+document.getElementById("filtroTeamOpciones").addEventListener("change",function(){
+  actualizarResumenMulti("filtroTeamOpciones","filtroTeamResumen","Todos los teams","Team","teams seleccionados");
+  renderTeam();renderAcum();
+});
+document.querySelectorAll('[data-multi-action]').forEach(btn=>btn.addEventListener('click',function(e){
+  e.preventDefault();e.stopPropagation();
+  const checks=[...document.querySelectorAll(`#${this.dataset.target} input[type="checkbox"]`)];
+  checks.forEach(c=>c.checked=this.dataset.multiAction==='all');
+  document.getElementById(this.dataset.target).dispatchEvent(new Event('change',{bubbles:true}));
+}));
+
+// Cierra los filtros múltiples al hacer clic fuera, al abrir otro o al presionar Escape.
+const filtrosMultiples=[...document.querySelectorAll('.multi-filter')];
+
+document.addEventListener('click',function(e){
+  filtrosMultiples.forEach(filtro=>{
+    if(filtro.open && !filtro.contains(e.target)) filtro.removeAttribute('open');
+  });
+});
+
+filtrosMultiples.forEach(filtro=>{
+  filtro.addEventListener('toggle',function(){
+    if(!filtro.open) return;
+    filtrosMultiples.forEach(otro=>{
+      if(otro!==filtro) otro.removeAttribute('open');
+    });
+  });
+});
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') filtrosMultiples.forEach(filtro=>filtro.removeAttribute('open'));
+});
 document.getElementById("filtroEstado").onchange=renderTeam;
 document.getElementById("ordenTabla").onchange=renderTeam;
 document.getElementById("buscar").oninput=function(){renderTeam();renderAcum();};
