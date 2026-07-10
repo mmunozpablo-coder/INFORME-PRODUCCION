@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte Ejecutivo Diario de Producción CEMA Constitución</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<style>
+:root{
+  --bg:#f6f5f1;
+  --card:#ffffff;
+  --ink:#1f2a24;
+  --muted:#696158;
+  --corteza:#696158;
+  --verde:#BFB800;
+  --naranja:#EA7600;
+  --madera:#DFD1A7;
+  --rojo:#ff2b2b;
+  --amarillo:#ffc000;
+  --gris:#d9d9d9;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(90deg,var(--corteza),#867b71);color:white;padding:16px 26px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:21px}
+header span{font-size:13px;opacity:.95}
+.logo{font-size:30px;font-weight:800}
+.wrap{max-width:1450px;margin:auto;padding:22px}
+.acciones{display:flex;justify-content:flex-end;margin-bottom:14px}
+button{border:none;border-radius:999px;background:var(--corteza);color:white;padding:10px 18px;font-weight:700;cursor:pointer}
+.mensaje{background:#fff3cd;color:#664d03;border:1px solid #ffecb5;padding:12px 16px;border-radius:12px;margin-bottom:16px;display:none}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{background:white;border-radius:16px;padding:18px;box-shadow:0 8px 22px rgba(0,0,0,.07);border-top:7px solid var(--verde)}
+.kpi h3{margin:0 0 10px;font-size:13px;color:var(--muted);text-transform:uppercase}
+.kpi strong{font-size:31px}
+.exec{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 18px}
+.exec-card{position:relative;overflow:hidden;background:white;border-radius:16px;padding:16px 16px 14px;box-shadow:0 8px 22px rgba(0,0,0,.07);border:1px solid rgba(105,97,88,.12);min-height:118px}
+.exec-card:before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--verde)}
+.exec-card.orange:before{background:var(--naranja)}
+.exec-card.red:before{background:var(--rojo)}
+.exec-card.yellow:before{background:var(--amarillo)}
+.exec-card.gray:before{background:var(--corteza)}
+.exec-icon{font-size:24px;margin-bottom:8px}
+.exec-card h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.2px}
+.exec-card strong{display:block;font-size:21px;line-height:1.15;color:var(--ink)}
+.exec-card span{display:block;margin-top:6px;color:var(--muted);font-size:13px}
+.exec-note{grid-column:1/-1;background:#fff7e8;border-left:6px solid var(--naranja);border-radius:12px;padding:12px 14px;color:#4b3300;box-shadow:0 5px 16px rgba(0,0,0,.04)}
+.grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:18px}
+.card{background:white;border-radius:16px;padding:18px;box-shadow:0 8px 22px rgba(0,0,0,.07);border:1px solid rgba(105,97,88,.12)}
+.card,.kpi,.exec-card{transition:transform .15s ease, box-shadow .15s ease}
+.card:hover,.kpi:hover,.exec-card:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.09)}
+.card h2{margin:0 0 14px;font-size:16px;color:var(--corteza)}
+.full{grid-column:1/-1}
+.toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.toolbar select,.toolbar input{min-width:170px}
+.filter-info{font-size:12px;color:var(--muted);margin:-4px 0 10px}
+.grupo-empresa td{background:#f3efdf;color:var(--corteza);font-weight:800;text-transform:uppercase;border-top:2px solid #e0d7bd}
+select,input{border:1px solid rgba(105,97,88,.25);border-radius:10px;padding:10px;background:white}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--corteza);color:white;text-align:left;padding:10px}
+td{padding:10px;border-bottom:1px solid #e7ebe5}
+.estado{display:inline-block;min-width:86px;text-align:center;padding:6px 10px;border-radius:999px;font-weight:700}
+.cumple{background:#92d050;color:#173b00}
+.atencion{background:var(--amarillo);color:#4b3300}
+.desviado{background:var(--rojo);color:white}
+.sin-meta{background:var(--gris);color:#333}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.mini div{background:#f3efdf;border-radius:12px;padding:12px;color:var(--corteza)}
+.mini b{display:block;font-size:20px;margin-top:4px}
+
+.emsefor-card{display:flex;flex-direction:column;gap:10px;overflow:visible;min-height:860px}
+.emsefor-section-title{background:var(--corteza);color:white;text-align:center;font-weight:800;font-size:11px;letter-spacing:.2px;text-transform:uppercase;padding:7px 10px;border-radius:10px 10px 0 0;margin-top:2px}
+.emsefor-chart-box{border:1px solid rgba(105,97,88,.15);border-radius:12px;padding:8px 10px;background:#fff;overflow:visible}
+.emsefor-bar-wrap{height:335px;position:relative}
+.emsefor-donut-layout{display:grid;grid-template-columns:315px 1fr;gap:14px;align-items:center}
+.emsefor-donut-wrap{height:285px;position:relative}
+.emsefor-legend{display:grid;gap:7px;font-size:11px;color:var(--ink)}
+.emsefor-legend-row{display:grid;grid-template-columns:12px 1fr auto;gap:7px;align-items:center}
+.emsefor-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.emsefor-total{display:inline-block;margin-top:6px;background:#f3efdf;border:1px solid #e0d7bd;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;color:var(--corteza)}
+.emsefor-ranking{width:100%;font-size:10.5px;margin-top:2px}
+.emsefor-ranking th{padding:6px 7px;text-align:center}
+.emsefor-ranking th:first-child,.emsefor-ranking td:first-child{text-align:left}
+.emsefor-ranking td{padding:5px 7px;text-align:center}
+.emsefor-ranking .empresa-cell{text-align:left;white-space:nowrap;max-width:310px;overflow:hidden;text-overflow:ellipsis}
+.emsefor-ranking .pos{width:22px;color:var(--muted);font-weight:700}
+.emsefor-ranking .ok{color:#006100;font-weight:800}
+.emsefor-ranking .bad{color:#c00000;font-weight:800}
+.emsefor-ranking-note{font-size:11px;color:var(--muted);font-style:italic;margin-top:4px}
+
+
+.tp-card{overflow:visible}
+.tp-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}
+.tp-subtitle{font-size:12px;color:var(--muted);margin-top:-8px}
+.tp-layout-mejorado{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch}
+.tp-panel{border:1px solid rgba(105,97,88,.15);border-radius:14px;background:#fff;padding:12px;min-height:260px}
+.tp-panel-title{background:var(--corteza);color:white;text-align:center;font-weight:800;font-size:11px;letter-spacing:.2px;text-transform:uppercase;padding:7px 10px;border-radius:10px 10px 0 0;margin:-12px -12px 10px}
+.tp-chart-wrap{height:265px;position:relative}
+.tp-donut-grid{display:grid;grid-template-columns:250px 1fr;gap:12px;align-items:center}
+.tp-donut-wrap{height:230px;position:relative}
+.tp-legend{display:grid;gap:8px;font-size:12px}
+.tp-legend-row{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center}
+.tp-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tp-table{font-size:11.5px;margin-top:4px}
+.tp-table th{padding:7px 8px;text-align:center}
+.tp-table td{padding:6px 8px;text-align:center}
+.tp-table td:first-child,.tp-table th:first-child{text-align:left}
+.tp-impacto{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.tp-impacto-card{background:#faf8f1;border-left:6px solid var(--naranja);border-radius:12px;padding:11px 12px;min-height:78px}
+.tp-impacto-card b{display:block;font-size:18px;color:var(--corteza);margin-top:5px}
+.tp-impacto-card span{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700}
+.tp-note{font-size:12px;color:var(--muted);font-style:italic;margin-top:8px}
+
+
+.tp-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.tp-box{border-radius:16px;padding:18px;color:white;background:linear-gradient(135deg,#696158,#8b8177);box-shadow:0 8px 22px rgba(0,0,0,.08)}
+.tp-box.orange{background:linear-gradient(135deg,#EA7600,#b85d00)}
+.tp-box.green{background:linear-gradient(135deg,#BFB800,#928d00)}
+.tp-box h3{margin:0 0 8px;font-size:13px;opacity:.95;text-transform:uppercase}
+.tp-box strong{font-size:30px;display:block}
+.tp-alerta{background:#fff7e8;border-left:6px solid var(--naranja);border-radius:12px;padding:12px 14px;margin-bottom:14px;color:#4b3300}
+.tp-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px}
+.badge-team{display:inline-block;background:#f3efdf;color:var(--corteza);border-radius:999px;padding:5px 10px;font-weight:700}
+.lista{display:grid;gap:10px}
+.item{border-left:6px solid var(--verde);background:#faf8f1;padding:12px;border-radius:10px}
+.item.rojo{border-left-color:var(--rojo)}
+.item.amarillo{border-left-color:var(--amarillo)}
+.item.naranja{border-left-color:var(--naranja)}
+.item.gris{border-left-color:var(--gris)}
+.item b{display:block;color:var(--corteza);margin-bottom:4px}
+canvas{max-height:335px}
+footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
+@media(max-width:900px){.kpis,.grid,.tp-kpis,.tp-layout,.exec{grid-template-columns:1fr}.mini{grid-template-columns:1fr}}
+
+
+
+
+
+/* El contenedor conserva exactamente la grilla original en pantalla. */
+.print-chart-pair{display:contents}
+
+/* =====================================================
+   ÚNICA CONFIGURACIÓN DE IMPRESIÓN
+   Imprime el mismo HTML, con los mismos gráficos Chart.js.
+   ===================================================== */
+@media print{
+  @page{size:legal landscape;margin:7mm}
+
+  html,body{
+    margin:0!important;
+    background:#fff!important;
+    color:var(--ink)!important;
+    overflow:visible!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+
+  *{box-sizing:border-box!important}
+  .acciones,.toolbar,.mensaje,footer,.print-omit{display:none!important}
+
+  header{
+    padding:8px 14px!important;
+    margin:0 0 6px!important;
+    break-after:avoid!important;
+  }
+  header h1{font-size:16px!important}
+  header span{font-size:10px!important}
+  .logo{font-size:21px!important}
+
+  .wrap{
+    max-width:none!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  .kpis,.exec{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-bottom:6px!important;
+  }
+  .kpi,.exec-card{
+    padding:8px 9px!important;
+    border-radius:9px!important;
+    min-height:0!important;
+    box-shadow:none!important;
+  }
+  .kpi{border-top-width:4px!important}
+  .exec-card:before{height:4px!important}
+  .kpi h3,.exec-card h3{font-size:8px!important;margin-bottom:3px!important}
+  .kpi strong{font-size:19px!important}
+  .exec-card strong{font-size:14px!important;white-space:normal!important}
+  .exec-card span{font-size:9px!important;margin-top:3px!important}
+  .exec-icon{font-size:14px!important;margin-bottom:2px!important}
+  .exec-note{padding:6px 9px!important;font-size:9px!important;border-left-width:4px!important}
+
+  .grid{
+    display:block!important;
+  }
+  .card{
+    padding:9px!important;
+    border-radius:10px!important;
+    box-shadow:none!important;
+    margin:0 0 7px!important;
+    border:1px solid rgba(105,97,88,.18)!important;
+  }
+  .card h2{font-size:12px!important;margin:0 0 7px!important}
+
+  /* PÁGINA 1: resumen + tabla de producción completa */
+  .grid>.card:nth-child(1){
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .grid>.card:nth-child(1) table{font-size:7.4px!important}
+  .grid>.card:nth-child(1) th,
+  .grid>.card:nth-child(1) td{padding:2.3px 4px!important;line-height:1.08!important}
+  .grid>.card:nth-child(1) .estado{min-width:52px!important;padding:2px 5px!important;font-size:7px!important}
+  .filter-info{font-size:8px!important;margin:0 0 4px!important}
+  .grupo-empresa{display:none!important}
+
+  /* PÁGINA 2: Emsefor, mismos gráficos y tabla */
+  .emsefor-card{
+    min-height:0!important;
+    height:auto!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:7px!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .emsefor-card>h2{grid-column:1/-1!important}
+  .emsefor-chart-box{padding:6px!important;border-radius:8px!important}
+  .emsefor-chart-box:nth-of-type(3){grid-column:1/-1!important}
+  .emsefor-section-title{font-size:7.5px!important;padding:4px!important}
+  .emsefor-bar-wrap{height:230px!important}
+  .emsefor-donut-layout{grid-template-columns:190px 1fr!important;gap:5px!important}
+  .emsefor-donut-wrap{height:205px!important}
+  .emsefor-legend{font-size:7.5px!important;gap:3px!important}
+  .emsefor-total{font-size:7.5px!important;padding:3px 7px!important}
+  .emsefor-ranking{font-size:7.2px!important}
+  .emsefor-ranking th,.emsefor-ranking td{padding:2.5px 4px!important;line-height:1.05!important}
+  .emsefor-ranking-note{font-size:7px!important}
+
+  /* PÁGINA 3: ambos gráficos originales, lado a lado */
+  .print-chart-pair{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .print-chart-pair .card{margin:0!important;min-height:175mm!important}
+  .print-chart-pair canvas{
+    width:100%!important;
+    height:155mm!important;
+    max-height:155mm!important;
+  }
+
+  /* PÁGINA 4: cumplimiento acumulado */
+  .grid>.card.full:not(.tp-card):not(.print-omit){
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .grid>.card.full:not(.tp-card):not(.print-omit) table{font-size:8.5px!important}
+  .grid>.card.full:not(.tp-card):not(.print-omit) th,
+  .grid>.card.full:not(.tp-card):not(.print-omit) td{padding:4px 6px!important;line-height:1.1!important}
+  .grid>.card.full:not(.tp-card):not(.print-omit) .estado{font-size:7.5px!important;padding:2px 6px!important;min-width:56px!important}
+
+  /* PÁGINAS 5 Y 6: tiempos perdidos sin comprimir ni superponer */
+  .tp-card{
+    padding:9px!important;
+    margin:0!important;
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+  }
+  .tp-head{margin-bottom:6px!important}
+  .tp-subtitle{font-size:8.5px!important;margin-top:-4px!important}
+  .tp-kpis{grid-template-columns:repeat(3,1fr)!important;gap:7px!important;margin-bottom:7px!important}
+  .tp-box{padding:9px!important;border-radius:9px!important;box-shadow:none!important}
+  .tp-box h3{font-size:8px!important;margin-bottom:4px!important}
+  .tp-box strong{font-size:20px!important}
+  .tp-box span{font-size:9px!important}
+  .tp-alerta{font-size:8.5px!important;padding:6px 8px!important;margin-bottom:7px!important}
+
+  .tp-charts-block{
+    grid-template-columns:1fr 1fr!important;
+    gap:7px!important;
+  }
+  .tp-charts-block .tp-panel{min-height:0!important;padding:7px!important}
+  .tp-charts-block .tp-panel-title{font-size:7.5px!important;padding:4px!important;margin:-7px -7px 5px!important}
+  .tp-chart-wrap{height:225px!important}
+  .tp-donut-grid{grid-template-columns:190px 1fr!important;gap:5px!important}
+  .tp-donut-wrap{height:205px!important}
+  .tp-legend{font-size:7.5px!important;gap:3px!important}
+  .tp-impacto{grid-template-columns:repeat(4,1fr)!important;gap:6px!important;margin-top:7px!important}
+  .tp-impacto-card{padding:7px!important;min-height:48px!important}
+  .tp-impacto-card span{font-size:7px!important}
+  .tp-impacto-card b{font-size:13px!important;margin-top:2px!important}
+
+  .tp-details-block{
+    break-before:page!important;
+    page-break-before:always!important;
+    grid-template-columns:1.15fr .85fr!important;
+    gap:8px!important;
+    margin-top:0!important;
+  }
+  .tp-details-block .tp-panel{padding:8px!important;min-height:0!important}
+  .tp-details-block .tp-panel-title{font-size:8px!important;padding:5px!important;margin:-8px -8px 6px!important}
+  .tp-table{font-size:8px!important}
+  .tp-table th,.tp-table td{padding:3.5px 5px!important;line-height:1.12!important}
+  .badge-team{font-size:7.5px!important;padding:2px 5px!important}
+  .tp-note{font-size:7.5px!important}
+
+  canvas{max-width:100%!important}
+}
+
+
+/* =====================================================
+   AJUSTE FINO PÁGINA EMSEFOR PARA IMPRESIÓN
+   Dos gráficos alineados arriba y ranking separado abajo.
+   ===================================================== */
+@media print{
+  .emsefor-card{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    grid-template-rows:auto 82mm auto!important;
+    column-gap:4mm!important;
+    row-gap:3mm!important;
+    align-items:start!important;
+    overflow:visible!important;
+  }
+
+  .emsefor-card>h2{
+    grid-column:1/-1!important;
+    margin:0!important;
+  }
+
+  .emsefor-card>.emsefor-chart-box:nth-of-type(1),
+  .emsefor-card>.emsefor-chart-box:nth-of-type(2){
+    height:82mm!important;
+    min-height:82mm!important;
+    max-height:82mm!important;
+    overflow:hidden!important;
+    padding:2mm!important;
+    margin:0!important;
+  }
+
+  .emsefor-card>.emsefor-chart-box:nth-of-type(3){
+    grid-column:1/-1!important;
+    margin-top:2mm!important;
+    padding:2mm!important;
+    position:relative!important;
+    z-index:3!important;
+    background:#fff!important;
+    overflow:visible!important;
+  }
+
+  .emsefor-section-title{
+    height:6mm!important;
+    line-height:4mm!important;
+    padding:1mm 2mm!important;
+    margin:0 0 1.5mm!important;
+  }
+
+  .emsefor-bar-wrap{
+    height:70mm!important;
+    max-height:70mm!important;
+    overflow:hidden!important;
+  }
+  .emsefor-bar-wrap canvas{
+    width:100%!important;
+    height:70mm!important;
+    max-height:70mm!important;
+  }
+
+  .emsefor-donut-layout{
+    display:grid!important;
+    grid-template-columns:44% 56%!important;
+    gap:2mm!important;
+    height:70mm!important;
+    align-items:center!important;
+    overflow:hidden!important;
+  }
+  .emsefor-donut-layout>div:first-child{
+    height:70mm!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  .emsefor-donut-wrap{
+    width:54mm!important;
+    height:54mm!important;
+    max-height:54mm!important;
+    flex:0 0 54mm!important;
+    overflow:hidden!important;
+  }
+  .emsefor-donut-wrap canvas{
+    width:54mm!important;
+    height:54mm!important;
+    max-width:54mm!important;
+    max-height:54mm!important;
+  }
+  .emsefor-total{
+    margin-top:1mm!important;
+    font-size:7.2px!important;
+    padding:1mm 2mm!important;
+  }
+  .emsefor-legend{
+    font-size:7.2px!important;
+    gap:1.2mm!important;
+    align-content:center!important;
+    overflow:hidden!important;
+  }
+  .emsefor-legend-row{
+    grid-template-columns:2.2mm 1fr auto!important;
+    gap:1.2mm!important;
+    line-height:1.1!important;
+  }
+  .emsefor-dot{width:2mm!important;height:2mm!important}
+
+  .emsefor-ranking{
+    width:100%!important;
+    table-layout:fixed!important;
+    font-size:7.4px!important;
+  }
+  .emsefor-ranking th,.emsefor-ranking td{
+    padding:1.05mm 1.5mm!important;
+    line-height:1.15!important;
+  }
+  .emsefor-ranking th:nth-child(1),.emsefor-ranking td:nth-child(1){width:4%!important}
+  .emsefor-ranking th:nth-child(2),.emsefor-ranking td:nth-child(2){width:43%!important}
+  .emsefor-ranking th:nth-child(n+3),.emsefor-ranking td:nth-child(n+3){width:10.6%!important}
+  .emsefor-ranking .empresa-cell{
+    max-width:none!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Reporte Ejecutivo Diario de Producción CEMA Constitución</h1>
+    <span id="fechaReporte">Esperando datos del reporte...</span>
+  </div>
+  <div class="logo">arauco</div>
+</header>
+
+<div class="wrap">
+  <div class="acciones"><button onclick="generarPDF()">Generar PDF</button></div>
+  <div id="mensaje" class="mensaje"></div>
+
+  <section class="kpis">
+    <div class="kpi"><h3>Total día PIRA</h3><strong id="kpiPira">0</strong><span> m³</span></div>
+    <div class="kpi"><h3>Total día EUGL</h3><strong id="kpiEugl">0</strong><span> m³</span></div>
+    <div class="kpi"><h3>Sin notificación EUNI</h3><strong id="kpiEuni">0</strong><span> m³</span></div>
+    <div class="kpi"><h3>Total general</h3><strong id="kpiGeneral">0</strong><span> m³</span></div>
+  </section>
+
+  <section class="exec">
+    <div class="exec-card green" id="cardMejorTeam">
+      <div class="exec-icon">🏆</div>
+      <h3>Mejor Team del día</h3>
+      <strong id="mejorTeam">-</strong>
+      <span id="mejorTeamVol">0 m³ producidos</span>
+    </div>
+    <div class="exec-card red" id="cardDesviado">
+      <div class="exec-icon">🚨</div>
+      <h3>Mayor desviación diaria</h3>
+      <strong id="teamDesviado">-</strong>
+      <span id="teamDesviadoDif">0 m³ bajo meta</span>
+    </div>
+    <div class="exec-card orange" id="cardEmsefor">
+      <div class="exec-icon">🏢</div>
+      <h3>Emsefor líder</h3>
+      <strong id="emseforLider">-</strong>
+      <span id="emseforLiderVol">0 m³</span>
+    </div>
+    <div class="exec-card gray" id="cardCumplimientoDia">
+      <div class="exec-icon">📈</div>
+      <h3>Cumplimiento diario CEMA</h3>
+      <strong id="cumplimientoDia">0%</strong>
+      <span id="cumplimientoDiaBase">0 / 0 m³</span>
+    </div>
+    <div class="exec-note" id="resumenEjecutivo">Resumen ejecutivo pendiente de datos.</div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Producción diaria por Team</h2>
+      <div class="toolbar">
+        <select id="filtroEmpresa">
+          <option value="Todos">Todas las empresas</option>
+        </select>
+        <select id="filtroTeam">
+          <option value="Todos">Todos los teams</option>
+        </select>
+        <select id="filtroEstado">
+          <option value="Todos">Todos los estados</option>
+          <option value="Cumple">Cumple</option>
+          <option value="Atención">Atención</option>
+          <option value="Desviado">Desviado</option>
+          <option value="Sin meta">Sin meta</option>
+        </select>
+        <select id="ordenTabla">
+          <option value="empresa">Ordenar por empresa</option>
+          <option value="vol_desc">Mayor volumen</option>
+          <option value="dif_asc">Mayor desviación</option>
+          <option value="team">Ordenar por team</option>
+        </select>
+        <input id="buscar" placeholder="Buscar team o emsefor...">
+      </div>
+      <div id="infoFiltros" class="filter-info">Mostrando todos los registros.</div>
+      <table>
+        <thead><tr><th>Team</th><th>Emsefor</th><th>Vol. día</th><th>Meta diaria</th><th>Dif.</th><th>Estado</th></tr></thead>
+        <tbody id="tablaTeam"></tbody>
+      </table>
+    </div>
+
+    <div class="card emsefor-card">
+      <h2>📊 Resumen por Emsefor</h2>
+
+      <div class="emsefor-chart-box">
+        <div class="emsefor-section-title">Volumen y meta diaria por empresa (m³)</div>
+        <div class="emsefor-bar-wrap"><canvas id="emseforChart"></canvas></div>
+      </div>
+
+      <div class="emsefor-chart-box">
+        <div class="emsefor-section-title">Participación porcentual del volumen día</div>
+        <div class="emsefor-donut-layout">
+          <div>
+            <div class="emsefor-donut-wrap"><canvas id="emseforDonutChart"></canvas></div>
+            <div id="emseforTotalDia" class="emsefor-total">Total volumen día: 0 m³</div>
+          </div>
+          <div id="emseforLegend" class="emsefor-legend"></div>
+        </div>
+      </div>
+
+      <div class="emsefor-chart-box">
+        <div class="emsefor-section-title">Ranking completo de empresas por volumen diario</div>
+        <table class="emsefor-ranking">
+          <thead><tr><th>#</th><th>Empresa</th><th>Vol. día</th><th>Meta</th><th>Dif.</th><th>Cumpl.</th><th>Part.</th></tr></thead>
+          <tbody id="tablaEmseforRanking"></tbody>
+        </table>
+        <div class="emsefor-ranking-note">Ranking completo de empresas por volumen diario, con meta y diferencia.</div>
+      </div>
+    </div>
+
+    <div class="print-chart-pair full">
+      <div class="card chart-card">
+        <h2>Producción real v/s capacidad diaria</h2>
+        <canvas id="lineChart"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <h2>Volumen acumulado por Team</h2>
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card full">
+      <h2>Estado de cumplimiento acumulado</h2>
+      <table>
+        <thead><tr><th>Team</th><th>Capacidad</th><th>Meta teórica</th><th>Volumen notificado</th><th>Cumplimiento</th><th>Estado</th></tr></thead>
+        <tbody id="tablaAcum"></tbody>
+      </table>
+    </div>
+
+    <div class="card full tp-card">
+      <div class="tp-head">
+        <div>
+          <h2>⏱️ Tiempos perdidos</h2>
+          <div class="tp-subtitle">Resumen ejecutivo de detenciones, causas principales e impacto operacional del día.</div>
+        </div>
+      </div>
+
+      <div class="tp-kpis">
+        <div class="tp-box"><h3>Total minutos perdidos</h3><strong id="tpMinutos">0</strong><span>minutos</span></div>
+        <div class="tp-box orange"><h3>Total horas perdidas</h3><strong id="tpHoras">0</strong><span>horas</span></div>
+        <div class="tp-box green"><h3>Team más afectado</h3><strong id="tpTeamTop">-</strong><span id="tpTeamTopMin">0 min</span></div>
+      </div>
+
+      <div id="tpAlerta" class="tp-alerta">Sin tiempos perdidos informados para el día.</div>
+
+      <div class="tp-layout-mejorado tp-charts-block">
+        <div class="tp-panel">
+          <div class="tp-panel-title">Ranking de minutos perdidos por Team</div>
+          <div class="tp-chart-wrap"><canvas id="tpTeamChart"></canvas></div>
+        </div>
+        <div class="tp-panel">
+          <div class="tp-panel-title">Participación por causa principal</div>
+          <div class="tp-donut-grid">
+            <div class="tp-donut-wrap"><canvas id="tpCausaChart"></canvas></div>
+            <div id="tpCausaLegend" class="tp-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tp-impacto">
+        <div class="tp-impacto-card"><span>Eventos registrados</span><b id="tpEventos">0</b></div>
+        <div class="tp-impacto-card"><span>Causas distintas</span><b id="tpCausas">0</b></div>
+        <div class="tp-impacto-card"><span>Promedio por evento</span><b id="tpPromedio">0 min</b></div>
+        <div class="tp-impacto-card"><span>Concentración principal</span><b id="tpConcentracion">0%</b></div>
+      </div>
+
+      <div class="tp-layout-mejorado tp-details-block" style="margin-top:14px">
+        <div class="tp-panel">
+          <div class="tp-panel-title">Detalle por Team y causa</div>
+          <table class="tp-table">
+            <thead><tr><th>Team</th><th>Descripción</th><th>Minutos</th></tr></thead>
+            <tbody id="tablaTpDetalle"></tbody>
+          </table>
+        </div>
+        <div class="tp-panel">
+          <div class="tp-panel-title">Ranking de causas</div>
+          <table class="tp-table">
+            <thead><tr><th>Causa</th><th>Minutos</th><th>Participación</th></tr></thead>
+            <tbody id="tablaTpCausas"></tbody>
+          </table>
+          <div class="tp-note">Lectura rápida para priorizar acciones sobre las causas que concentran más tiempo perdido.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card print-omit"><h2>Equipos detenidos</h2><div id="equiposDetenidos" class="lista"></div></div>
+    <div class="card print-omit"><h2>Quiebres operacionales</h2><div id="quiebres" class="lista"></div></div>
+    <div class="card print-omit"><h2>Predios relevantes</h2><div id="predios" class="lista"></div></div>
+    <div class="card print-omit"><h2>Hallazgos del día</h2><div id="hallazgos" class="lista"></div></div>
+    <div class="card full print-omit"><h2>Compromisos / próximos pasos</h2><div id="compromisos" class="lista"></div></div>
+  </section>
+
+  <footer>Reporte generado desde BASE_HTML / datos.js.</footer>
+</div>
+
+
+
+<script>
+Chart.register(ChartDataLabels);
+
+let equipos = [];
+let acumulado = [];
+let emseforData = [];
+let serieDiaria = [];
+let tiemposTeam = [];
+let tiemposDetalle = [];
+let kpiGlobal = {};
+
+let emseforChart = null;
+let emseforDonutChart = null;
+let lineChart = null;
+let barChart = null;
+let tpTeamChart = null;
+let tpCausaChart = null;
+
+const colores = ["#696158","#BFB800","#EA7600","#DFD1A7","#867b71","#a6a000","#b85d00","#cfc09c"];
+
+function n(v){
+  if(v===null || v===undefined || v==="") return 0;
+  if(typeof v==="number") return v;
+  let texto=String(v).trim().replace(/\s/g,"").replace(/m³|m3|%/gi,"");
+  if(texto.includes(",") && texto.includes(".")) texto=texto.replace(/\./g,"").replace(",",".");
+  else if(texto.includes(",")) texto=texto.replace(",",".");
+  const num=Number(texto);
+  return isNaN(num)?0:num;
+}
+function t(v){return v===null || v===undefined ? "" : String(v).trim();}
+function fmt(v){return n(v).toLocaleString("es-CL",{maximumFractionDigits:0});}
+function fmt1(v){return n(v).toLocaleString("es-CL",{maximumFractionDigits:1});}
+function pct(v){
+  if(v===null || v===undefined || v==="") return "0%";
+  if(typeof v==="string" && v.includes("%")) return v;
+  const x=n(v);
+  return x<=1.5 ? Math.round(x*100)+"%" : Math.round(x)+"%";
+}
+function get(o,keys,def=""){
+  for(const k of keys){ if(o && Object.prototype.hasOwnProperty.call(o,k)) return o[k]; }
+  return def;
+}
+function claseEstado(e){
+  const x=t(e).toLowerCase();
+  if(x==="cumple") return "cumple";
+  if(x==="atención" || x==="atencion") return "atencion";
+  if(x==="desviado") return "desviado";
+  return "sin-meta";
+}
+function colorItem(e){
+  const x=t(e).toLowerCase();
+  if(x.includes("rojo") || x.includes("desviado") || x.includes("crítico") || x.includes("critico")) return "rojo";
+  if(x.includes("amarillo") || x.includes("atención") || x.includes("atencion")) return "amarillo";
+  if(x.includes("naranja")) return "naranja";
+  return "";
+}
+function obtenerKpi(kpi,campo){
+  if(Array.isArray(kpi)){
+    const fila=kpi.find(x=>t(get(x,["CAMPO","Campo","campo"])).toUpperCase()===campo);
+    return fila ? get(fila,["VALOR","Valor","valor"],0) : 0;
+  }
+  return get(kpi||{},[campo,campo.toLowerCase(),campo.toUpperCase()],0);
+}
+function cargarKpis(kpi){
+  document.getElementById("fechaReporte").textContent = obtenerKpi(kpi,"FECHA_REPORTE") || "Reporte Ejecutivo Diario de Producción";
+  document.getElementById("kpiPira").textContent = fmt(obtenerKpi(kpi,"TOTAL_PIRA"));
+  document.getElementById("kpiEugl").textContent = fmt(obtenerKpi(kpi,"TOTAL_EUGL"));
+  document.getElementById("kpiEuni").textContent = fmt(obtenerKpi(kpi,"TOTAL_EUNI"));
+  document.getElementById("kpiGeneral").textContent = fmt(obtenerKpi(kpi,"TOTAL_GENERAL"));
+}
+function mapTeam(r){
+  return {
+    team:t(get(r,["TEAM","Team","team"])),
+    emsefor:t(get(r,["EMSEFOR","Emsefor","emsefor"])),
+    vol:n(get(r,["VOL_DIA","Vol. día","VOL DIA","vol"])),
+    meta:n(get(r,["META_DIARIA","Meta diaria","META DIA","meta"])),
+    dif:n(get(r,["DIF","Dif.","dif"])),
+    estado:t(get(r,["ESTADO","Estado","estado"],"Sin meta"))
+  };
+}
+function mapEmsefor(r){
+  return {
+    emsefor:t(get(r,["EMSEFOR","Emsefor","emsefor"])),
+    vol:n(get(r,["VOL_DIA","Vol. día","VOL DIA","vol"])),
+    meta:n(get(r,["META_DIARIA","Meta diaria","META DIA","meta"])),
+    dif:n(get(r,["DIF","Dif.","dif"])),
+    estado:t(get(r,["ESTADO","Estado","estado"],""))
+  };
+}
+function mapAcum(r){
+  const cumplimientoVal = get(r,["CUMPLIMIENTO","Cumplimiento","cumplimiento"],"0%");
+  const c = n(cumplimientoVal);
+  let pct = c <= 2 ? c*100 : c;
+  let estadoFinal;
+  if(pct >= 100) estadoFinal = "Cumple";
+  else if(pct >= 95) estadoFinal = "Atención";
+  else estadoFinal = "Desviado";
+
+  return {
+    team:t(get(r,["TEAM","Team","team"])),
+    capacidad:n(get(r,["CAPACIDAD","Capacidad","capacidad"])),
+    meta:n(get(r,["META_TEORICA","Meta teórica","META TEORICA","meta"])),
+    vol:n(get(r,["VOL_NOTIFICADO","Volumen notificado","VOLUMEN_NOTIFICADO","vol"])),
+    cumplimiento:cumplimientoVal,
+    estado:estadoFinal
+  };
+}
+function mapSerie(r){
+  return {
+    fecha:t(get(r,["FECHA","Fecha","fecha"])),
+    team:t(get(r,["TEAM","Team","team"])),
+    real:n(get(r,["PRODUCCION_REAL","Producción real","PRODUCCION REAL","real"])),
+    capacidad:n(get(r,["CAPACIDAD_DIARIA","Capacidad diaria","CAPACIDAD DIARIA","capacidad","META DIARIA"]))
+  };
+}
+function mapTpTeam(r){
+  return {team:t(get(r,["TEAM","Team","team"])), minutos:n(get(r,["MINUTOS","Minutos","minutos","Suma de Tiempo (Min)"]))};
+}
+function mapTpDetalle(r){
+  return {
+    team:t(get(r,["TEAM","Team","team"])),
+    descripcion:t(get(r,["DESCRIPCION","Descripción","Descripcion","descripcion"])),
+    minutos:n(get(r,["MINUTOS","Minutos","minutos","Suma de Tiempo (Min)"]))
+  };
+}
+
+function cumplimientoNumero(v){
+  const x=n(v);
+  return x<=2 ? x*100 : x;
+}
+function claseCumplimientoPct(valor){
+  const c=cumplimientoNumero(valor);
+  if(c>=100) return "green";
+  if(c>=95) return "yellow";
+  return "red";
+}
+
+function normalizarTxt(v){
+  return t(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+function empresaDeTeam(team){
+  const fila=equipos.find(x=>normalizarTxt(x.team)===normalizarTxt(team));
+  return fila ? fila.emsefor : "";
+}
+function llenarFiltros(){
+  const empSel=document.getElementById("filtroEmpresa");
+  const teamSel=document.getElementById("filtroTeam");
+  const empActual=empSel.value || "Todos";
+  const teamActual=teamSel.value || "Todos";
+
+  const empresas=[...new Set(equipos.map(x=>x.emsefor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  empSel.innerHTML='<option value="Todos">Todas las empresas</option>' + empresas.map(e=>`<option value="${e}">${e}</option>`).join("");
+  if(empresas.includes(empActual)) empSel.value=empActual;
+
+  const empresaFiltro=empSel.value;
+  const teams=[...new Set(equipos
+    .filter(x=>empresaFiltro==="Todos" || x.emsefor===empresaFiltro)
+    .map(x=>x.team)
+    .filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"es", {numeric:true}));
+
+  teamSel.innerHTML='<option value="Todos">Todos los teams</option>' + teams.map(e=>`<option value="${e}">${e}</option>`).join("");
+  if(teams.includes(teamActual)) teamSel.value=teamActual;
+}
+function filtrarEquipos(){
+  const empresa=document.getElementById("filtroEmpresa").value;
+  const team=document.getElementById("filtroTeam").value;
+  const estado=document.getElementById("filtroEstado").value;
+  const q=normalizarTxt(document.getElementById("buscar").value);
+
+  let data=equipos.filter(x=>
+    (empresa==="Todos" || x.emsefor===empresa) &&
+    (team==="Todos" || x.team===team) &&
+    (estado==="Todos" || x.estado===estado) &&
+    (q==="" || normalizarTxt(x.team).includes(q) || normalizarTxt(x.emsefor).includes(q))
+  );
+
+  const orden=document.getElementById("ordenTabla").value;
+  if(orden==="vol_desc") data.sort((a,b)=>b.vol-a.vol);
+  else if(orden==="dif_asc") data.sort((a,b)=>a.dif-b.dif);
+  else if(orden==="team") data.sort((a,b)=>a.team.localeCompare(b.team,"es",{numeric:true}));
+  else data.sort((a,b)=>a.emsefor.localeCompare(b.emsefor,"es") || a.team.localeCompare(b.team,"es",{numeric:true}));
+
+  return data;
+}
+
+function renderResumenEjecutivo(){
+  const mejor=[...equipos].sort((a,b)=>b.vol-a.vol)[0] || {team:"-",vol:0};
+  const peor=[...equipos].sort((a,b)=>a.dif-b.dif)[0] || {team:"-",dif:0};
+  const lider=[...emseforData].sort((a,b)=>b.vol-a.vol)[0] || {emsefor:"-",vol:0};
+
+  const produccionDia = n(obtenerKpi(kpiGlobal,"TOTAL_GENERAL")) || equipos.reduce((acc,x)=>acc+x.vol,0);
+  const capacidadDia = (serieDiaria.length ? n(serieDiaria[serieDiaria.length-1].capacidad) : 0);
+  const cumplimiento = capacidadDia>0 ? produccionDia/capacidadDia*100 : 0;
+  const tpMin = tiemposTeam.reduce((acc,x)=>acc+x.minutos,0);
+  const topTp = tiemposTeam[0] || {team:"-",minutos:0};
+
+  document.getElementById("mejorTeam").textContent = mejor.team;
+  document.getElementById("mejorTeamVol").textContent = fmt(mejor.vol) + " m³ producidos";
+  document.getElementById("teamDesviado").textContent = peor.team;
+  document.getElementById("teamDesviadoDif").textContent = fmt(Math.abs(peor.dif)) + " m³ bajo meta";
+  document.getElementById("emseforLider").textContent = lider.emsefor;
+  document.getElementById("emseforLiderVol").textContent = fmt(lider.vol) + " m³";
+  document.getElementById("cumplimientoDia").textContent = fmt1(cumplimiento) + "%";
+  document.getElementById("cumplimientoDiaBase").textContent = fmt(produccionDia) + " / " + fmt(capacidadDia) + " m³";
+
+  const card=document.getElementById("cardCumplimientoDia");
+  card.classList.remove("green","yellow","red","gray");
+  card.classList.add(capacidadDia>0 ? claseCumplimientoPct(cumplimiento) : "gray");
+
+  const estadoTxt = cumplimiento>=100 ? "sobre la meta diaria" : cumplimiento>=95 ? "cerca de la meta diaria" : "bajo la meta diaria";
+  document.getElementById("resumenEjecutivo").innerHTML = `📌 <b>Lectura ejecutiva:</b> Constitución produjo <b>${fmt(produccionDia)} m³</b>, equivalente a <b>${fmt1(cumplimiento)}%</b> de la capacidad diaria (${fmt(capacidadDia)} m³), quedando <b>${estadoTxt}</b>. El mejor desempeño del día fue <b>${mejor.team}</b> y el principal foco por tiempos perdidos fue <b>${topTp.team}</b> con <b>${fmt(topTp.minutos)} min</b>.`;
+}
+
+function renderTeam(){
+  const data=filtrarEquipos();
+  const totalVol=data.reduce((acc,x)=>acc+x.vol,0);
+  const totalMeta=data.reduce((acc,x)=>acc+x.meta,0);
+  document.getElementById("infoFiltros").textContent =
+    `Mostrando ${data.length} registros | Volumen: ${fmt(totalVol)} m³ | Meta: ${fmt(totalMeta)} m³ | Dif.: ${fmt(totalVol-totalMeta)} m³`;
+
+  let html="";
+  let empresaActual="";
+  data.forEach(x=>{
+    if(x.emsefor!==empresaActual){
+      empresaActual=x.emsefor;
+      const sub=data.filter(y=>y.emsefor===empresaActual);
+      const vol=sub.reduce((a,y)=>a+y.vol,0);
+      const meta=sub.reduce((a,y)=>a+y.meta,0);
+      html += `<tr class="grupo-empresa"><td colspan="6">${empresaActual || "Sin empresa"} | Vol. ${fmt(vol)} m³ | Meta ${fmt(meta)} m³ | Dif. ${fmt(vol-meta)} m³</td></tr>`;
+    }
+    html += `<tr><td>${x.team}</td><td>${x.emsefor}</td><td>${fmt(x.vol)}</td><td>${fmt(x.meta)}</td><td>${fmt(x.dif)}</td><td><span class="estado ${claseEstado(x.estado)}">${x.estado}</span></td></tr>`;
+  });
+  document.getElementById("tablaTeam").innerHTML=html || `<tr><td colspan="6">Sin registros para los filtros seleccionados.</td></tr>`;
+}
+function renderAcum(){
+  const empresa=document.getElementById("filtroEmpresa").value;
+  const teamFiltro=document.getElementById("filtroTeam").value;
+  const q=normalizarTxt(document.getElementById("buscar").value);
+
+  let data=acumulado.map(x=>({...x, emsefor: empresaDeTeam(x.team)})).filter(x=>
+    (empresa==="Todos" || x.emsefor===empresa) &&
+    (teamFiltro==="Todos" || x.team===teamFiltro) &&
+    (q==="" || normalizarTxt(x.team).includes(q) || normalizarTxt(x.emsefor).includes(q))
+  );
+
+  data.sort((a,b)=>a.emsefor.localeCompare(b.emsefor,"es") || a.team.localeCompare(b.team,"es",{numeric:true}));
+
+  document.getElementById("tablaAcum").innerHTML=data.map(x=>`
+    <tr><td>${x.team}</td><td>${fmt(x.capacidad)}</td><td>${fmt(x.meta)}</td><td>${fmt(x.vol)}</td><td>${pct(x.cumplimiento)}</td><td><span class="estado ${claseEstado(x.estado)}">${x.estado}</span></td></tr>
+  `).join("") || `<tr><td colspan="6">Sin registros para los filtros seleccionados.</td></tr>`;
+}
+function emseforOrdenado(){
+  return [...emseforData].sort((a,b)=>b.vol-a.vol);
+}
+function renderMini(){
+  const data=emseforOrdenado();
+  const total=data.reduce((acc,x)=>acc+x.vol,0);
+  const legend=document.getElementById("emseforLegend");
+  const ranking=document.getElementById("tablaEmseforRanking");
+  const totalBox=document.getElementById("emseforTotalDia");
+
+  if(totalBox) totalBox.textContent="Total volumen día: " + fmt(total) + " m³";
+
+  if(legend){
+    legend.innerHTML=data.map((x,i)=>{
+      const part=total>0 ? x.vol/total*100 : 0;
+      return `<div class="emsefor-legend-row"><span class="emsefor-dot" style="background:${colores[i%colores.length]}"></span><span>${x.emsefor}</span><b>${fmt1(part)}%</b></div>`;
+    }).join("");
+  }
+
+  if(ranking){
+    ranking.innerHTML=data.map((x,i)=>{
+      const dif=x.vol-x.meta;
+      const cum=x.meta>0 ? x.vol/x.meta*100 : 0;
+      const part=total>0 ? x.vol/total*100 : 0;
+      const claseDif=dif>=0 ? "ok" : "bad";
+      return `<tr>
+        <td class="pos">${i+1}</td>
+        <td class="empresa-cell"><span class="emsefor-dot" style="background:${colores[i%colores.length]}"></span> ${x.emsefor}</td>
+        <td>${fmt(x.vol)}</td>
+        <td>${fmt(x.meta)}</td>
+        <td class="${claseDif}">${dif>=0?"+":""}${fmt(dif)}</td>
+        <td class="${cum>=100?"ok":"bad"}">${fmt1(cum)}%</td>
+        <td>${fmt1(part)}%</td>
+      </tr>`;
+    }).join("");
+  }
+}
+
+function causasTiempos(){
+  const resumen={};
+  tiemposDetalle.forEach(x=>{
+    const causa=t(x.descripcion) || "Sin descripción";
+    if(!resumen[causa]) resumen[causa]=0;
+    resumen[causa]+=n(x.minutos);
+  });
+  return Object.entries(resumen).map(([descripcion,minutos])=>({descripcion,minutos})).sort((a,b)=>b.minutos-a.minutos);
+}
+
+function destruirGraficos(){
+  if(emseforChart) emseforChart.destroy();
+  if(emseforDonutChart) emseforDonutChart.destroy();
+  if(lineChart) lineChart.destroy();
+  if(barChart) barChart.destroy();
+  if(tpTeamChart) tpTeamChart.destroy();
+  if(tpCausaChart) tpCausaChart.destroy();
+}
+function renderGraficos(){
+  destruirGraficos();
+  const emData=emseforOrdenado();
+  emseforChart=new Chart(document.getElementById("emseforChart"),{
+    type:"bar",
+    data:{
+      labels:emData.map(x=>x.emsefor),
+      datasets:[
+        {label:"Volumen día",data:emData.map(x=>x.vol),backgroundColor:emData.map((_,i)=>colores[i%colores.length]),datalabels:{anchor:"end",align:"right",font:{weight:"bold",size:10},formatter:v=>fmt(v),clip:false}},
+        {label:"Meta diaria",data:emData.map(x=>x.meta),backgroundColor:"#DFD1A7",datalabels:{anchor:"end",align:"right",font:{weight:"bold",size:9},formatter:v=>fmt(v),clip:false}}
+      ]
+    },
+    options:{
+      indexAxis:"y",
+      responsive:true,
+      maintainAspectRatio:false,
+      layout:{padding:{right:32}},
+      plugins:{legend:{display:true,position:"top"},datalabels:{clamp:true}},
+      scales:{x:{beginAtZero:true,grace:"12%"},y:{ticks:{font:{size:10}}}}
+    }
+  });
+  emseforDonutChart=new Chart(document.getElementById("emseforDonutChart"),{
+    type:"doughnut",
+    data:{labels:emData.map(x=>x.emsefor),datasets:[{data:emData.map(x=>x.vol),backgroundColor:emData.map((_,i)=>colores[i%colores.length]),borderColor:"#fff",borderWidth:2}]},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      cutout:"54%",
+      plugins:{legend:{display:false},datalabels:{color:"#fff",font:{weight:"bold",size:12},formatter:(v,ctx)=>{const total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+n(b),0);return total>0?Math.round(v/total*100)+"%":"";}}}
+    }
+  });
+  lineChart=new Chart(document.getElementById("lineChart"),{
+    type:"line",
+    data:{
+      labels:serieDiaria.map(x=>x.fecha),
+      datasets:[
+        {
+          label:"Producción real",
+          data:serieDiaria.map(x=>x.real),
+          borderColor:"#BFB800",
+          backgroundColor:"#BFB800",
+          tension:.18,
+          pointRadius:4,
+          pointHoverRadius:5,
+          pointBackgroundColor:"#BFB800",
+          borderWidth:3,
+          datalabels:{
+            align:"bottom",
+            anchor:"end",
+            offset:10,
+            color:"#BFB800",
+            font:{weight:"bold",size:10},
+            formatter:v=>fmt(v),
+            clamp:true
+          }
+        },
+        {
+          label:"Capacidad diaria",
+          data:serieDiaria.map(x=>x.capacidad),
+          borderColor:"#696158",
+          backgroundColor:"#696158",
+          tension:0,
+          pointRadius:4,
+          pointHoverRadius:5,
+          pointBackgroundColor:"#696158",
+          borderWidth:3,
+          datalabels:{
+            align:"top",
+            anchor:"end",
+            offset:12,
+            color:"#696158",
+            font:{weight:"bold",size:10},
+            formatter:v=>fmt(v),
+            clamp:true
+          }
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      layout:{
+        padding:{top:42,right:26,left:8,bottom:8}
+      },
+      plugins:{
+        legend:{
+          display:true,
+          position:"top",
+          align:"center",
+          labels:{padding:22,boxWidth:36,boxHeight:10}
+        },
+        datalabels:{clip:false}
+      },
+      scales:{
+        y:{beginAtZero:true,grace:"12%"},
+        x:{ticks:{maxRotation:0,minRotation:0}}
+      }
+    }
+  });
+  barChart=new Chart(document.getElementById("barChart"),{
+    type:"bar",
+    data:{labels:acumulado.map(x=>x.team),datasets:[
+      {label:"Volumen acumulado",data:acumulado.map(x=>x.vol),backgroundColor:"#DFD1A7",datalabels:{anchor:"end",align:"top",font:{weight:"bold",size:10},formatter:v=>fmt(v)}},
+      {label:"Meta teórica",type:"line",data:acumulado.map(x=>x.meta),borderColor:"#EA7600",backgroundColor:"#EA7600",pointRadius:4,datalabels:{align:"top",anchor:"end",color:"#EA7600",font:{weight:"bold",size:9},formatter:v=>fmt(v)}}
+    ]},
+    options:{responsive:true}
+  });
+  tpTeamChart=new Chart(document.getElementById("tpTeamChart"),{
+    type:"bar",
+    data:{labels:tiemposTeam.map(x=>x.team),datasets:[{label:"Minutos perdidos",data:tiemposTeam.map(x=>x.minutos),backgroundColor:tiemposTeam.map((_,i)=>colores[i%colores.length]),datalabels:{anchor:"end",align:"top",font:{weight:"bold",size:10},formatter:v=>fmt(v)}}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grace:"15%"}}}
+  });
+  const causas=causasTiempos();
+  const causaCanvas=document.getElementById("tpCausaChart");
+  if(causaCanvas){
+    tpCausaChart=new Chart(causaCanvas,{
+      type:"doughnut",
+      data:{labels:causas.map(x=>x.descripcion),datasets:[{data:causas.map(x=>x.minutos),backgroundColor:causas.map((_,i)=>colores[i%colores.length]),borderColor:"#fff",borderWidth:2}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:"55%",plugins:{legend:{display:false},datalabels:{color:"#fff",font:{weight:"bold",size:11},formatter:(v,ctx)=>{const total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+n(b),0);return total>0?Math.round(v/total*100)+"%":"";}}}}
+    });
+  }
+}
+function renderTiemposPerdidos(){
+  const totalMin=tiemposTeam.reduce((acc,x)=>acc+x.minutos,0);
+  const totalHoras=totalMin/60;
+  const top=tiemposTeam.length>0 ? tiemposTeam[0] : {team:"-",minutos:0};
+  const causas=causasTiempos();
+  const topCausa=causas[0] || {descripcion:"-",minutos:0};
+  const eventos=tiemposDetalle.length;
+  const promedio=eventos>0 ? totalMin/eventos : 0;
+  const concentracion=totalMin>0 ? topCausa.minutos/totalMin*100 : 0;
+
+  document.getElementById("tpMinutos").textContent=fmt(totalMin);
+  document.getElementById("tpHoras").textContent=fmt1(totalHoras);
+  document.getElementById("tpTeamTop").textContent=top.team;
+  document.getElementById("tpTeamTopMin").textContent=fmt(top.minutos)+" min";
+
+  const ev=document.getElementById("tpEventos"); if(ev) ev.textContent=fmt(eventos);
+  const ca=document.getElementById("tpCausas"); if(ca) ca.textContent=fmt(causas.length);
+  const pr=document.getElementById("tpPromedio"); if(pr) pr.textContent=fmt1(promedio)+" min";
+  const co=document.getElementById("tpConcentracion"); if(co) co.textContent=fmt1(concentracion)+"%";
+
+  const alerta=document.getElementById("tpAlerta");
+  if(totalMin>0){
+    alerta.innerHTML=`⚠️ Se registran <b>${fmt(totalMin)} minutos</b> de tiempo perdido, equivalentes a <b>${fmt1(totalHoras)} horas</b>. El team más afectado es <b>${top.team}</b> con <b>${fmt(top.minutos)} min</b>. La causa principal corresponde a <b>${topCausa.descripcion}</b>, con <b>${fmt(topCausa.minutos)} min</b>.`;
+  }else{
+    alerta.innerHTML="Sin tiempos perdidos informados para el día.";
+  }
+
+  const totalCausas=causas.reduce((a,x)=>a+x.minutos,0);
+  const legend=document.getElementById("tpCausaLegend");
+  if(legend){
+    legend.innerHTML=causas.map((x,i)=>{
+      const part=totalCausas>0 ? x.minutos/totalCausas*100 : 0;
+      return `<div class="tp-legend-row"><span class="tp-dot" style="background:${colores[i%colores.length]}"></span><span>${x.descripcion}</span><b>${fmt1(part)}%</b></div>`;
+    }).join("") || `<div class="tp-legend-row"><span></span><span>Sin causas registradas</span><b>0%</b></div>`;
+  }
+
+  document.getElementById("tablaTpDetalle").innerHTML=tiemposDetalle.map(x=>`
+    <tr><td><span class="badge-team">${x.team}</span></td><td>${x.descripcion}</td><td><b>${fmt(x.minutos)}</b></td></tr>
+  `).join("") || `<tr><td colspan="3">Sin detalle de tiempos perdidos.</td></tr>`;
+
+  const tablaCausas=document.getElementById("tablaTpCausas");
+  if(tablaCausas){
+    tablaCausas.innerHTML=causas.map(x=>{
+      const part=totalCausas>0 ? x.minutos/totalCausas*100 : 0;
+      return `<tr><td>${x.descripcion}</td><td><b>${fmt(x.minutos)}</b></td><td>${fmt1(part)}%</td></tr>`;
+    }).join("") || `<tr><td colspan="3">Sin causas registradas.</td></tr>`;
+  }
+}
+function renderLista(id,data,tituloKeys,textoKeys,estadoKeys){
+  const el=document.getElementById(id);
+  if(!data || data.length===0){
+    el.innerHTML=`<div class="item gris"><b>Sin registros</b>No se informan antecedentes para esta sección.</div>`;
+    return;
+  }
+  el.innerHTML=data.map(r=>{
+    const titulo=t(get(r,tituloKeys,"Registro"));
+    const texto=t(get(r,textoKeys,""));
+    const estado=t(get(r,estadoKeys,""));
+    return `<div class="item ${colorItem(estado)}"><b>${titulo}</b>${texto || estado || ""}</div>`;
+  }).join("");
+}
+
+
+function cargarDatos(data){
+  dataExtraPrint = data || {};
+  kpiGlobal = data.kpi || data.T_KPI || {};
+  cargarKpis(kpiGlobal);
+  equipos=(data.team_dia || data.T_TEAM_DIA || []).map(mapTeam).filter(x=>x.team);
+  emseforData=(data.emsefor || data.T_EMSEFOR || []).map(mapEmsefor).filter(x=>x.emsefor);
+  acumulado=(data.acumulado || data.T_ACUMULADO || []).map(mapAcum).filter(x=>x.team);
+  serieDiaria=(data.serie_diaria || data.T_SERIE_DIARIA || []).map(mapSerie).filter(x=>x.fecha || x.team);
+  tiemposTeam=(data.tiempos_team || data.T_TP_TEAM || []).map(mapTpTeam).filter(x=>x.team);
+  tiemposDetalle=(data.tiempos_detalle || data.T_TP_DETALLE || []).map(mapTpDetalle).filter(x=>x.team);
+  equipos.sort((a,b)=>a.emsefor.localeCompare(b.emsefor,"es") || a.team.localeCompare(b.team,"es",{numeric:true}));
+  emseforData.sort((a,b)=>b.vol-a.vol);
+  acumulado.sort((a,b)=>a.team.localeCompare(b.team,"es",{numeric:true}));
+  tiemposTeam.sort((a,b)=>b.minutos-a.minutos);
+  tiemposDetalle.sort((a,b)=>b.minutos-a.minutos);
+  if(emseforData.length===0 && equipos.length>0){
+    const resumen={};
+    equipos.forEach(x=>{ if(!resumen[x.emsefor]) resumen[x.emsefor]=0; resumen[x.emsefor]+=x.vol; });
+    emseforData=Object.entries(resumen).map(([emsefor,vol])=>({emsefor,vol})).sort((a,b)=>b.vol-a.vol);
+  }
+  llenarFiltros();
+  renderResumenEjecutivo();
+  renderTeam();
+  renderAcum();
+  renderMini();
+  renderTiemposPerdidos();
+  renderGraficos();
+  renderLista("equiposDetenidos",data.equipos_detenidos || data.T_EQUIPOS_DETENIDOS || [],["EQUIPO","Equipo","TEAM","Team"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
+  renderLista("quiebres",data.quiebres || data.T_QUIEBRES || [],["QUIEBRE","Quiebre","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
+  renderLista("predios",data.predios || data.T_PREDIOS_RELEVANTES || [],["PREDIO","Predio","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
+  renderLista("hallazgos",data.hallazgos || data.T_HALLAZGOS || [],["HALLAZGO","Hallazgo","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
+  renderLista("compromisos",data.compromisos || data.T_COMPROMISOS || [],["COMPROMISO","Compromiso","TITULO","Título"],["DETALLE","Detalle","RESPONSABLE","Responsable"],["ESTADO","Estado"]);
+}
+function mensaje(txt){
+  const box=document.getElementById("mensaje");
+  box.textContent=txt;
+  box.style.display="block";
+}
+document.getElementById("filtroEmpresa").onchange=function(){llenarFiltros();renderTeam();renderAcum();};
+document.getElementById("filtroTeam").onchange=function(){renderTeam();renderAcum();};
+document.getElementById("filtroEstado").onchange=renderTeam;
+document.getElementById("ordenTabla").onchange=renderTeam;
+document.getElementById("buscar").oninput=function(){renderTeam();renderAcum();};
+
+
+function redimensionarGraficosParaImpresion(){
+  [emseforChart,emseforDonutChart,lineChart,barChart,tpTeamChart,tpCausaChart].forEach(g=>{
+    if(g && typeof g.resize === "function") g.resize();
+  });
+}
+
+window.addEventListener("beforeprint", ()=>{
+  redimensionarGraficosParaImpresion();
+});
+window.addEventListener("afterprint", ()=>{
+  redimensionarGraficosParaImpresion();
+});
+
+function generarPDF(){
+  redimensionarGraficosParaImpresion();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
+}
+
+const script=document.createElement("script");
+script.src="datos.js?v="+new Date().getTime();
+script.onload=function(){
+  if(typeof reporteData!=="undefined"){
+    cargarDatos(reporteData);
+  }else{
+    mensaje("datos.js no contiene información válida.");
+  }
+};
+script.onerror=function(){
+  mensaje("No se encontró datos.js. Ejecuta la macro 'Generar_Reporte_HTML_Completo'.");
+};
+document.body.appendChild(script);
+</script>
+</body>
+</html>
