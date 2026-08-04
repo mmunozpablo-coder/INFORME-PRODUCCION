@@ -1,0 +1,36 @@
+name: Actualizar datos.js
+
+on:
+  repository_dispatch:
+    types:
+      - actualizar-datos
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Reemplazar datos.js
+        env:
+          DATOS_JS_BASE64: ${{ github.event.client_payload.contenido }}
+        run: |
+          printf '%s' "$DATOS_JS_BASE64" | base64 --decode > datos.js
+
+      - name: Guardar actualización
+        run: |
+          git config user.name "Power Automate"
+          git config user.email "power-automate@users.noreply.github.com"
+          git add datos.js
+
+          if git diff --cached --quiet; then
+            echo "datos.js no presentó cambios"
+          else
+            git commit -m "Actualizar datos.js automáticamente"
+            git push
+          fi
