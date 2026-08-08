@@ -456,6 +456,587 @@ footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
   }
 }
 
+/* =====================================================
+   ORDEN EJECUTIVO DE IMPRESIÓN
+   Mantiene intacta la vista en pantalla y evita cortes.
+   ===================================================== */
+@media print{
+  .grid{display:flex!important;flex-direction:column!important;gap:0!important}
+
+  /* Hoja 1: indicadores + dos gráficos principales */
+  .print-chart-pair{
+    order:1!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:3mm!important;
+    height:112mm!important;
+    margin:0!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .print-chart-pair .card{
+    height:112mm!important;
+    min-height:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  .print-chart-pair canvas{
+    width:100%!important;
+    height:99mm!important;
+    max-height:99mm!important;
+  }
+
+  /* Hoja 2: resumen por Emsefor */
+  .emsefor-card{order:2!important}
+
+  /* Hojas 3 y 4: tiempos perdidos */
+  .tp-card{order:3!important}
+
+  /* Última hoja: acumulado y listado completo de líneas */
+  .acum-card{
+    order:4!important;
+    height:auto!important;
+    margin:0!important;
+    overflow:visible!important;
+    break-before:page!important;
+    page-break-before:always!important;
+    break-after:avoid!important;
+    page-break-after:avoid!important;
+  }
+  .acum-card table{font-size:7px!important;table-layout:fixed!important}
+  .acum-card th,.acum-card td{padding:.9mm 1.5mm!important;line-height:1.02!important}
+  .acum-card .estado{font-size:6.5px!important;min-width:18mm!important;padding:.6mm 1.1mm!important}
+
+  .daily-team-card{
+    order:5!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:2mm 0 0!important;
+    overflow:visible!important;
+    break-before:avoid!important;
+    page-break-before:avoid!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .daily-team-card table{font-size:7.1px!important;table-layout:fixed!important}
+  .daily-team-card th,.daily-team-card td{padding:1mm 1.7mm!important;line-height:1.02!important}
+  .daily-team-card .estado{font-size:6.6px!important;min-width:18mm!important;padding:.6mm 1.2mm!important}
+}
+
+/* =====================================================
+   ACABADO EDITORIAL DE IMPRESIÓN
+   Escala proporcionada, cifras alineadas y mejor uso de hoja.
+   ===================================================== */
+@media print{
+  @page{size:legal landscape;margin:8mm}
+
+  body{font-family:"Segoe UI",Arial,sans-serif!important;font-size:9px!important}
+  table{font-variant-numeric:tabular-nums lining-nums!important}
+  th{letter-spacing:.12px!important}
+  td{vertical-align:middle!important}
+  .card{border-color:#d7d2c8!important}
+  .card h2{font-size:11px!important;font-weight:700!important;letter-spacing:.1px!important}
+
+  /* Todas las cifras quedan alineadas por su último dígito. */
+  .daily-team-card th:nth-child(n+3):not(:last-child),
+  .daily-team-card td:nth-child(n+3):not(:last-child),
+  .acum-card th:nth-child(n+2):not(:last-child),
+  .acum-card td:nth-child(n+2):not(:last-child),
+  .emsefor-ranking th:nth-child(n+3),
+  .emsefor-ranking td:nth-child(n+3),
+  .tp-table th:nth-child(n+3),
+  .tp-table td:nth-child(n+3){text-align:right!important}
+  .daily-team-card th:last-child,.daily-team-card td:last-child,
+  .acum-card th:last-child,.acum-card td:last-child{text-align:center!important}
+
+  /* Hoja 1: gráficos más altos, sin deformar tipografías ni valores. */
+  .print-chart-pair{height:124mm!important;gap:4mm!important}
+  .print-chart-pair .card{height:124mm!important;padding:3mm!important}
+  .print-chart-pair canvas{height:109mm!important;max-height:109mm!important;aspect-ratio:auto!important}
+
+  /* Hoja 2: aire uniforme entre gráficos y ranking. */
+  .emsefor-card{height:184mm!important;grid-template-rows:7mm 91mm 75mm!important;gap:3mm 4mm!important;padding:3mm!important}
+  .emsefor-chart-box{padding:2.2mm!important}
+  .emsefor-ranking{font-size:7.8px!important}
+  .emsefor-ranking th,.emsefor-ranking td{padding:1.15mm 1.6mm!important}
+
+  /* Hoja 3: ocupa mejor el alto disponible. */
+  .tp-card{padding:3mm!important}
+  .tp-charts-block{height:132mm!important;gap:4mm!important}
+  .tp-charts-block .tp-panel{height:132mm!important;padding:2.5mm!important}
+  .tp-charts-block .tp-panel-title{margin:-2.5mm -2.5mm 2mm!important;padding:1.4mm!important}
+  .tp-chart-wrap{height:117mm!important}
+  .tp-chart-wrap canvas{height:117mm!important;max-height:117mm!important;aspect-ratio:auto!important}
+  .tp-donut-grid{height:117mm!important;grid-template-columns:46% 54%!important;gap:2mm!important}
+  .tp-donut-wrap{height:92mm!important}
+  .tp-donut-wrap canvas{height:92mm!important;max-height:92mm!important;aspect-ratio:auto!important}
+  .tp-legend{font-size:7.5px!important;gap:1.3mm!important}
+
+  /* Hoja 4: detalle más legible y proporcionado. */
+  .tp-details-block{height:184mm!important;gap:4mm!important;padding-top:3mm!important}
+  .tp-details-block .tp-panel{height:178mm!important;padding:3mm!important}
+  .tp-details-block .tp-panel-title{font-size:8px!important;margin:-3mm -3mm 2mm!important;padding:1.5mm!important}
+  .tp-table{font-size:8px!important}
+  .tp-table th,.tp-table td{padding:1.7mm 1.8mm!important;line-height:1.08!important}
+
+  /* Hojas 5 y 6: tablas a escala de lectura ejecutiva. */
+  .acum-card,.daily-team-card{padding:3.5mm!important;border-radius:3mm!important}
+  .acum-card table,.daily-team-card table{font-size:8.2px!important}
+  .acum-card th,.acum-card td,
+  .daily-team-card th,.daily-team-card td{padding:1.65mm 2mm!important;line-height:1.08!important}
+  .acum-card .estado,.daily-team-card .estado{font-size:7.2px!important;min-width:20mm!important;padding:.85mm 1.4mm!important}
+  .filter-info{font-size:7.6px!important;margin:0 0 1.6mm!important}
+
+  /* Donut grande y leyenda sin cortar el símbolo %. */
+  .emsefor-donut-layout{grid-template-columns:52% 48%!important;gap:3mm!important;padding:0 3mm!important}
+  .emsefor-donut-layout>div:first-child{overflow:visible!important}
+  .emsefor-donut-wrap{
+    width:70mm!important;
+    height:70mm!important;
+    max-width:70mm!important;
+    max-height:70mm!important;
+    flex:0 0 70mm!important;
+    overflow:visible!important;
+  }
+  .emsefor-donut-wrap canvas{
+    width:70mm!important;
+    height:70mm!important;
+    max-width:70mm!important;
+    max-height:70mm!important;
+    aspect-ratio:1/1!important;
+  }
+  .emsefor-legend{font-size:7.7px!important;gap:1.35mm!important;padding-right:3mm!important;overflow:visible!important}
+  .emsefor-legend-row{grid-template-columns:2.2mm minmax(0,1fr) 13mm!important;gap:1.4mm!important}
+  .emsefor-legend-row b{text-align:right!important;white-space:nowrap!important;overflow:visible!important}
+}
+
+/* =====================================================
+   ESCALA FINAL DE LECTURA PARA PDF
+   ===================================================== */
+@media print{
+  /* El comparativo de 22 teams recibe el ancho principal de la hoja. */
+  .print-chart-pair{grid-template-columns:.68fr 1.32fr!important;gap:4mm!important}
+  .print-chart-pair .card:first-child{padding:3mm 2.5mm!important}
+  .print-chart-pair .card:last-child{padding:3mm 4mm!important}
+
+  /* Detalle operacional más grande y equilibrado. */
+  .tp-details-block{grid-template-columns:1.08fr .92fr!important;gap:4mm!important}
+  .tp-details-block .tp-panel{padding:3.5mm!important}
+  .tp-details-block .tp-panel-title{margin:-3.5mm -3.5mm 2.5mm!important;font-size:9px!important}
+  .tp-details-block .tp-table{font-size:9px!important}
+  .tp-details-block .tp-table th,
+  .tp-details-block .tp-table td{padding:2.15mm 2.2mm!important;line-height:1.12!important}
+  .tp-details-block .badge-team{font-size:8px!important;padding:.9mm 1.5mm!important}
+  .tp-details-block .tp-note{font-size:8px!important;margin-top:2mm!important}
+
+  /* Las dos tablas finales ocupan la hoja completa y dejan de verse pequeñas. */
+  .acum-card,.daily-team-card{
+    height:180mm!important;
+    min-height:180mm!important;
+    padding:5mm!important;
+  }
+  .acum-card h2,.daily-team-card h2{font-size:12px!important;margin-bottom:2.5mm!important}
+  .acum-card table,.daily-team-card table{font-size:9px!important}
+  .acum-card th,.acum-card td,
+  .daily-team-card th,.daily-team-card td{padding:2.05mm 2.3mm!important;line-height:1.12!important}
+  .acum-card .estado,.daily-team-card .estado{
+    font-size:8px!important;
+    min-width:22mm!important;
+    padding:1mm 1.6mm!important;
+  }
+  .daily-team-card .filter-info{font-size:8.3px!important;margin-bottom:2mm!important}
+}
+
+/* =====================================================
+   GRÁFICO ACUMULADO A PÁGINA COMPLETA
+   ===================================================== */
+@media print{
+  .print-chart-pair{display:contents!important}
+
+  .trend-chart-card{
+    order:1!important;
+    width:100%!important;
+    height:124mm!important;
+    min-height:124mm!important;
+    margin:0!important;
+    padding:3.5mm!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    overflow:hidden!important;
+  }
+  .trend-chart-card canvas{width:100%!important;height:108mm!important;max-height:108mm!important}
+
+  .accumulated-chart-card{
+    order:2!important;
+    width:100%!important;
+    height:184mm!important;
+    min-height:184mm!important;
+    margin:0!important;
+    padding:4mm!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    overflow:hidden!important;
+  }
+  .accumulated-chart-card h2{font-size:12px!important;margin-bottom:2mm!important}
+  .accumulated-chart-card canvas{width:100%!important;height:166mm!important;max-height:166mm!important}
+
+  .emsefor-card{order:3!important}
+  .tp-card{order:4!important}
+  .acum-card{order:5!important}
+  .daily-team-card{order:6!important}
+}
+
+/* El resumen por empresa vuelve a compartir la primera hoja: solo son ocho
+   categorías y ya no requiere una página adicional. */
+@media print{
+  .print-chart-pair{
+    order:1!important;
+    display:grid!important;
+    grid-template-columns:.82fr 1.18fr!important;
+    gap:4mm!important;
+    height:124mm!important;
+    break-after:page!important;
+    page-break-after:always!important;
+  }
+  .trend-chart-card,.accumulated-chart-card{
+    width:auto!important;
+    height:124mm!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:3mm!important;
+    break-after:avoid!important;
+    page-break-after:auto!important;
+  }
+  .trend-chart-card canvas,.accumulated-chart-card canvas{
+    width:100%!important;
+    height:108mm!important;
+    max-height:108mm!important;
+  }
+  .emsefor-card{order:2!important}
+  .tp-card{order:3!important}
+  .acum-card{order:4!important}
+  .daily-team-card{order:5!important}
+}
+
+/* Proporción final de la hoja Resumen por Emsefor. */
+@media print{
+  .emsefor-card{
+    height:174mm!important;
+    grid-template-rows:7mm 80mm 72mm!important;
+    column-gap:4mm!important;
+    row-gap:3mm!important;
+    padding:3.5mm!important;
+    align-content:start!important;
+  }
+  .emsefor-card>.emsefor-chart-box:nth-of-type(1),
+  .emsefor-card>.emsefor-chart-box:nth-of-type(2){
+    height:80mm!important;
+    min-height:80mm!important;
+    max-height:80mm!important;
+    padding:2mm!important;
+  }
+  .emsefor-card>.emsefor-chart-box:nth-of-type(3){
+    height:72mm!important;
+    margin-top:0!important;
+    padding:2mm!important;
+    overflow:hidden!important;
+  }
+  .emsefor-bar-wrap,
+  .emsefor-bar-wrap canvas{height:68mm!important;max-height:68mm!important}
+
+  .emsefor-donut-layout{
+    grid-template-columns:43% 57%!important;
+    height:68mm!important;
+    gap:2.5mm!important;
+    padding:0 2mm!important;
+    overflow:hidden!important;
+  }
+  .emsefor-donut-layout>div:first-child{
+    height:68mm!important;
+    justify-content:center!important;
+  }
+  .emsefor-donut-wrap,
+  .emsefor-donut-wrap canvas{
+    width:56mm!important;
+    height:56mm!important;
+    max-width:56mm!important;
+    max-height:56mm!important;
+    flex:0 0 56mm!important;
+  }
+  .emsefor-total{font-size:7.3px!important;margin-top:.7mm!important;padding:.8mm 2mm!important}
+  .emsefor-legend{font-size:7.7px!important;gap:1.2mm!important;padding-right:2mm!important}
+  .emsefor-legend-row{grid-template-columns:2.2mm minmax(0,1fr) 12mm!important;gap:1.2mm!important}
+
+  .emsefor-ranking{font-size:8px!important}
+  .emsefor-ranking th,.emsefor-ranking td{padding:1.2mm 1.6mm!important;line-height:1.08!important}
+  .emsefor-ranking-note{font-size:7px!important;margin-top:1mm!important}
+}
+
+/* Tablas finales a página completa: escala vertical real, sin dejar media hoja vacía. */
+@media print{
+  .acum-card,.daily-team-card{
+    height:184mm!important;
+    min-height:184mm!important;
+    padding:5mm!important;
+  }
+  .acum-card h2,.daily-team-card h2{
+    font-size:13px!important;
+    margin-bottom:3mm!important;
+  }
+  .daily-team-card .filter-info{
+    font-size:9px!important;
+    margin-bottom:2.5mm!important;
+  }
+  .acum-card table,.daily-team-card table{
+    width:100%!important;
+    font-size:10px!important;
+  }
+  .acum-card th,.acum-card td,
+  .daily-team-card th,.daily-team-card td{
+    height:6.35mm!important;
+    padding:2.45mm 2.5mm!important;
+    line-height:1.12!important;
+  }
+  .acum-card th,.daily-team-card th{
+    font-size:9.5px!important;
+    font-weight:700!important;
+  }
+  .acum-card .estado,.daily-team-card .estado{
+    font-size:8.5px!important;
+    min-width:23mm!important;
+    padding:1.05mm 1.8mm!important;
+  }
+}
+
+/* =====================================================
+   PROPORCIONES NATURALES DE GRÁFICOS EN PDF
+   Esta capa final prevalece sobre los ajustes históricos.
+   Mantiene círculos perfectos y evita gráficos demasiado
+   altos o estirados al llenar la hoja.
+   ===================================================== */
+@media print{
+  /* Resumen principal: ambos gráficos alineados, cada uno con
+     una relación ancho/alto apropiada para su cantidad de datos. */
+  .print-chart-pair{
+    grid-template-columns:43fr 57fr!important;
+    height:106mm!important;
+    align-items:start!important;
+  }
+  .trend-chart-card,
+  .accumulated-chart-card{
+    height:106mm!important;
+    min-height:106mm!important;
+  }
+  .trend-chart-card canvas{
+    height:88mm!important;
+    max-height:88mm!important;
+  }
+  .accumulated-chart-card canvas{
+    height:88mm!important;
+    max-height:88mm!important;
+  }
+
+  /* Resumen por empresa: barras horizontales amplias y donut
+     estrictamente cuadrado, sin compresión elíptica. */
+  .emsefor-bar-wrap,
+  .emsefor-bar-wrap canvas{
+    height:64mm!important;
+    max-height:64mm!important;
+  }
+  .emsefor-donut-wrap,
+  .emsefor-donut-wrap canvas{
+    width:56mm!important;
+    height:56mm!important;
+    min-width:56mm!important;
+    min-height:56mm!important;
+    max-width:56mm!important;
+    max-height:56mm!important;
+    aspect-ratio:1 / 1!important;
+  }
+
+  /* Tiempos perdidos: el ranking deja de ocupar una altura
+     excesiva; el donut conserva diámetro y leyenda legibles. */
+  .tp-charts-block,
+  .tp-charts-block .tp-panel{
+    height:112mm!important;
+  }
+  .tp-chart-wrap,
+  .tp-chart-wrap canvas{
+    height:94mm!important;
+    max-height:94mm!important;
+  }
+  .tp-donut-grid{
+    height:94mm!important;
+    grid-template-columns:43% 57%!important;
+    align-items:center!important;
+  }
+  .tp-donut-wrap,
+  .tp-donut-wrap canvas{
+    width:78mm!important;
+    height:78mm!important;
+    min-width:78mm!important;
+    min-height:78mm!important;
+    max-width:78mm!important;
+    max-height:78mm!important;
+    aspect-ratio:1 / 1!important;
+    margin:auto!important;
+  }
+
+  /* Evita que una regla genérica de canvas vuelva a imponer
+     una altura incompatible sobre los gráficos circulares. */
+  .emsefor-donut-wrap canvas,
+  .tp-donut-wrap canvas{
+    object-fit:contain!important;
+  }
+}
+
+
+/* Producción por tipo de producto */
+.product-card{background:linear-gradient(180deg,#fff,#fbfaf7)}
+.product-intro{color:var(--muted);margin:-4px 0 14px}
+.product-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.product-kpi{border-radius:12px;padding:14px 16px;color:white;background:linear-gradient(135deg,#696158,#867b71)}
+.product-kpi.aserrable{background:linear-gradient(135deg,#006b7f,#008ca3)}
+.product-kpi span{display:block;font-size:12px;opacity:.9}.product-kpi strong{display:block;font-size:28px;margin-top:3px}
+.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.product-panel{border:1px solid #ded8cf;border-radius:12px;overflow:hidden;background:white;height:100%;display:flex;flex-direction:column}
+.product-panel h3{margin:0;padding:12px 14px;background:#696158;color:white;font-size:15px}
+.product-panel.aserrable h3{background:#006b7f}
+.product-table{font-size:11.5px;margin:0;table-layout:fixed;width:100%}.product-table th{background:#e8e3db;color:#3e3934;padding:7px}.product-table td{padding:6px 8px}
+.product-panel .product-table{flex:1}
+.product-table td:last-child,.product-table th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:800px){.product-grid,.product-kpis{grid-template-columns:1fr}}
+@media print{.product-card{break-before:page;page-break-before:always}.product-table{font-size:8.4px}.product-table th,.product-table td{padding:3.5px 5px}}
+
+/* =====================================================
+   DISTRIBUCIÓN DEFINITIVA DEL PDF - CEMA ZONA NORTE
+   Esta capa reemplaza las reglas históricas de impresión.
+   ===================================================== */
+@media print{
+  @page{size:landscape;margin:6mm}
+
+  html,body{width:auto!important;height:auto!important;margin:0!important;padding:0!important}
+  .wrap{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+
+  /* El orden del PDF queda independiente del orden interactivo. */
+  .grid{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:0!important;
+  }
+
+  /* PÁGINA 1: portada ejecutiva y producción diaria completa. */
+  .daily-team-card{
+    order:1!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:2.5mm 0 0!important;
+    padding:3mm!important;
+    break-before:auto!important;
+    page-break-before:auto!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .daily-team-card h2{font-size:10.5px!important;margin:0 0 1.2mm!important}
+  .daily-team-card .filter-info{font-size:7px!important;margin:0 0 1mm!important}
+  .daily-team-card table{font-size:6.7px!important;line-height:1!important;table-layout:fixed!important}
+  .daily-team-card th,.daily-team-card td{height:auto!important;padding:.65mm 1.25mm!important;line-height:1!important}
+  .daily-team-card .emsefor-row td{padding:.55mm 1.25mm!important}
+  .daily-team-card .estado{font-size:6.2px!important;min-width:15mm!important;padding:.35mm .9mm!important}
+
+  /* PÁGINA 2: MR Pulpable y MSS Aserrable juntas, sin cortes. */
+  .product-card{
+    order:2!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:4mm!important;
+    break-before:page!important;
+    page-break-before:always!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .product-card h2{font-size:13px!important;margin:0 0 1.5mm!important}
+  .product-intro{font-size:8px!important;margin:0 0 2mm!important}
+  .product-kpis{grid-template-columns:1fr 1fr!important;gap:4mm!important;margin-bottom:3mm!important}
+  .product-kpi{padding:3mm 4mm!important;border-radius:3mm!important}
+  .product-kpi span{font-size:8px!important}.product-kpi strong{font-size:19px!important;margin-top:.5mm!important}
+  .product-grid{display:grid!important;grid-template-columns:1fr 1.22fr!important;gap:4mm!important;align-items:stretch!important}
+  .product-panel{height:100%!important;display:flex!important;flex-direction:column!important;break-inside:avoid!important;page-break-inside:avoid!important}
+  .product-panel h3{font-size:9px!important;padding:2mm 2.5mm!important}
+  .product-table{font-size:7.4px!important;line-height:1.02!important;table-layout:fixed!important}
+  .product-table th,.product-table td{height:auto!important;padding:1.15mm 1.5mm!important;line-height:1.02!important}
+
+  /* PÁGINA 3: evolución y volumen/meta por empresa. */
+  .print-chart-pair{
+    order:3!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:82mm 82mm!important;
+    gap:5mm!important;
+    width:100%!important;
+    height:169mm!important;
+    margin:0!important;
+    break-before:page!important;
+    page-break-before:always!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .print-chart-pair .card{
+    width:100%!important;
+    height:82mm!important;
+    min-height:82mm!important;
+    margin:0!important;
+    padding:3mm 4mm!important;
+    break-before:auto!important;
+    page-break-before:auto!important;
+    break-after:auto!important;
+    page-break-after:auto!important;
+  }
+  .print-chart-pair .card h2{font-size:10px!important;margin:0 0 1mm!important}
+  .print-chart-pair canvas{
+    display:block!important;
+    width:100%!important;
+    height:68mm!important;
+    max-height:68mm!important;
+    aspect-ratio:auto!important;
+  }
+
+  /* PÁGINA 4: resumen completo por Emsefor. */
+  .emsefor-card{
+    order:4!important;
+    width:100%!important;
+    margin:0!important;
+    break-before:page!important;
+    page-break-before:always!important;
+    break-after:page!important;
+    page-break-after:always!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+
+  /* PÁGINA 5: cumplimiento acumulado. */
+  .acum-card{
+    order:5!important;
+    width:100%!important;
+    margin:0!important;
+    break-before:page!important;
+    page-break-before:always!important;
+    break-after:auto!important;
+    page-break-after:auto!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -508,7 +1089,7 @@ footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
   </section>
 
   <section class="grid">
-    <div class="card">
+    <div class="card daily-team-card">
       <h2>Producción diaria por Team</h2>
       <div class="toolbar">
         <details class="multi-filter" id="filtroEmpresaBox">
@@ -577,18 +1158,18 @@ footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
     </div>
 
     <div class="print-chart-pair full">
-      <div class="card chart-card">
+      <div class="card chart-card trend-chart-card">
         <h2>Producción real v/s capacidad diaria</h2>
         <canvas id="lineChart"></canvas>
       </div>
 
-      <div class="card chart-card">
+      <div class="card chart-card accumulated-chart-card">
         <h2>Volumen acumulado por Team</h2>
         <canvas id="barChart"></canvas>
       </div>
     </div>
 
-    <div class="card full">
+    <div class="card full acum-card">
       <h2>Estado de cumplimiento acumulado</h2>
       <table>
         <thead><tr><th>Team</th><th>Capacidad</th><th>Meta teórica</th><th>Volumen notificado</th><th>Cumplimiento</th><th>Estado</th></tr></thead>
@@ -596,91 +1177,48 @@ footer{font-size:12px;color:var(--muted);text-align:right;margin-top:18px}
       </table>
     </div>
 
-    <div class="card full tp-card">
-      <div class="tp-head">
-        <div>
-          <h2>⏱️ Tiempos perdidos</h2>
-          <div class="tp-subtitle">Resumen ejecutivo de detenciones, causas principales e impacto operacional del día.</div>
-        </div>
+    <div class="card full product-card">
+      <h2>🌲 Producción por tipo de producto</h2>
+      <div class="product-intro">Distribución del volumen diario informado en las NOC para MR Pulpable y MSS Aserrable.</div>
+      <div class="product-kpis">
+        <div class="product-kpi"><span>MR Pulpable</span><strong id="totalPulpable">0 m³</strong></div>
+        <div class="product-kpi aserrable"><span>MSS Aserrable</span><strong id="totalAserrable">0 m³</strong></div>
       </div>
-
-      <div class="tp-kpis">
-        <div class="tp-box"><h3>Total minutos perdidos</h3><strong id="tpMinutos">0</strong><span>minutos</span></div>
-        <div class="tp-box orange"><h3>Total horas perdidas</h3><strong id="tpHoras">0</strong><span>horas</span></div>
-        <div class="tp-box green"><h3>Team más afectado</h3><strong id="tpTeamTop">-</strong><span id="tpTeamTopMin">0 min</span></div>
-      </div>
-
-      <div id="tpAlerta" class="tp-alerta">Sin tiempos perdidos informados para el día.</div>
-
-      <div class="tp-layout-mejorado tp-charts-block">
-        <div class="tp-panel">
-          <div class="tp-panel-title">Ranking de minutos perdidos por Team</div>
-          <div class="tp-chart-wrap"><canvas id="tpTeamChart"></canvas></div>
+      <div class="product-grid">
+        <div class="product-panel">
+          <h3>🪵 MR Pulpable por Team</h3>
+          <table class="product-table"><thead><tr><th>Team</th><th>Volumen m³ SSC</th></tr></thead><tbody id="tablaPulpable"></tbody></table>
         </div>
-        <div class="tp-panel">
-          <div class="tp-panel-title">Participación por causa principal</div>
-          <div class="tp-donut-grid">
-            <div class="tp-donut-wrap"><canvas id="tpCausaChart"></canvas></div>
-            <div id="tpCausaLegend" class="tp-legend"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="tp-impacto">
-        <div class="tp-impacto-card"><span>Eventos registrados</span><b id="tpEventos">0</b></div>
-        <div class="tp-impacto-card"><span>Causas distintas</span><b id="tpCausas">0</b></div>
-        <div class="tp-impacto-card"><span>Promedio por evento</span><b id="tpPromedio">0 min</b></div>
-        <div class="tp-impacto-card"><span>Concentración principal</span><b id="tpConcentracion">0%</b></div>
-      </div>
-
-      <div class="tp-layout-mejorado tp-details-block" style="margin-top:14px">
-        <div class="tp-panel">
-          <div class="tp-panel-title">Detalle por Team y causa</div>
-          <table class="tp-table">
-            <thead><tr><th>Team</th><th>Descripción</th><th>Minutos</th></tr></thead>
-            <tbody id="tablaTpDetalle"></tbody>
-          </table>
-        </div>
-        <div class="tp-panel">
-          <div class="tp-panel-title">Ranking de causas</div>
-          <table class="tp-table">
-            <thead><tr><th>Causa</th><th>Minutos</th><th>Participación</th></tr></thead>
-            <tbody id="tablaTpCausas"></tbody>
-          </table>
-          <div class="tp-note">Lectura rápida para priorizar acciones sobre las causas que concentran más tiempo perdido.</div>
+        <div class="product-panel aserrable">
+          <h3>🏭 MSS Aserrable por empresa y Team</h3>
+          <table class="product-table"><thead><tr><th>Empresa</th><th>Team</th><th>Volumen m³ SSC</th></tr></thead><tbody id="tablaAserrable"></tbody></table>
         </div>
       </div>
     </div>
 
-    <div class="card print-omit"><h2>Equipos detenidos</h2><div id="equiposDetenidos" class="lista"></div></div>
-    <div class="card print-omit"><h2>Quiebres operacionales</h2><div id="quiebres" class="lista"></div></div>
-    <div class="card print-omit"><h2>Predios relevantes</h2><div id="predios" class="lista"></div></div>
-    <div class="card print-omit"><h2>Hallazgos del día</h2><div id="hallazgos" class="lista"></div></div>
-    <div class="card full print-omit"><h2>Compromisos / próximos pasos</h2><div id="compromisos" class="lista"></div></div>
   </section>
-
-  <footer>Reporte generado desde BASE_HTML / datos.js.</footer>
 </div>
 
 
 
 <script>
 Chart.register(ChartDataLabels);
+Chart.defaults.font.family="Arial";
+Chart.defaults.font.size=11;
 
 let equipos = [];
 let acumulado = [];
 let emseforData = [];
 let serieDiaria = [];
-let tiemposTeam = [];
-let tiemposDetalle = [];
+let pulpable = [];
+let aserrable = [];
 let kpiGlobal = {};
 
 let emseforChart = null;
 let emseforDonutChart = null;
 let lineChart = null;
 let barChart = null;
-let tpTeamChart = null;
-let tpCausaChart = null;
+
 
 const colores = ["#696158","#BFB800","#EA7600","#DFD1A7","#867b71","#a6a000","#b85d00","#cfc09c"];
 
@@ -734,15 +1272,22 @@ function cargarKpis(kpi){
   document.getElementById("kpiEuni").textContent = fmt(obtenerKpi(kpi,"TOTAL_EUNI"));
   document.getElementById("kpiGeneral").textContent = fmt(obtenerKpi(kpi,"TOTAL_GENERAL"));
 }
+function estadoPorCumplimiento(porcentaje){
+  if(porcentaje>=95) return "Cumple";
+  if(porcentaje>=90) return "Atención";
+  return "Desviado";
+}
 function mapTeam(r){
-  return {
+  const fila={
     team:t(get(r,["TEAM","Team","team"])),
     emsefor:t(get(r,["EMSEFOR","Emsefor","emsefor"])),
     vol:n(get(r,["VOL_DIA","Vol. día","VOL DIA","vol"])),
     meta:n(get(r,["META_DIARIA","Meta diaria","META DIA","meta"])),
     dif:n(get(r,["DIF","Dif.","dif"])),
-    estado:t(get(r,["ESTADO","Estado","estado"],"Sin meta"))
+    estado:"Sin meta"
   };
+  if(fila.meta>0) fila.estado=estadoPorCumplimiento(fila.vol/fila.meta*100);
+  return fila;
 }
 function mapEmsefor(r){
   return {
@@ -757,10 +1302,7 @@ function mapAcum(r){
   const cumplimientoVal = get(r,["CUMPLIMIENTO","Cumplimiento","cumplimiento"],"0%");
   const c = n(cumplimientoVal);
   let pct = c <= 2 ? c*100 : c;
-  let estadoFinal;
-  if(pct >= 100) estadoFinal = "Cumple";
-  else if(pct >= 95) estadoFinal = "Atención";
-  else estadoFinal = "Desviado";
+  const estadoFinal=estadoPorCumplimiento(pct);
 
   return {
     team:t(get(r,["TEAM","Team","team"])),
@@ -779,14 +1321,14 @@ function mapSerie(r){
     capacidad:n(get(r,["CAPACIDAD_DIARIA","Capacidad diaria","CAPACIDAD DIARIA","capacidad","META DIARIA"]))
   };
 }
-function mapTpTeam(r){
-  return {team:t(get(r,["TEAM","Team","team"])), minutos:n(get(r,["MINUTOS","Minutos","minutos","Suma de Tiempo (Min)"]))};
+function mapPulpable(r){
+  return {team:t(get(r,["TEAM","Team","team"])), volumen:n(get(r,["VOLUMEN_M3","PRODUCCION_REAL","MINUTOS","Suma de VOLUMEN_M3_SSC"]))};
 }
-function mapTpDetalle(r){
+function mapAserrable(r){
   return {
+    emsefor:t(get(r,["EMSEFOR","NOMBRE_EMPRESARIO","Empresa","empresa"])),
     team:t(get(r,["TEAM","Team","team"])),
-    descripcion:t(get(r,["DESCRIPCION","Descripción","Descripcion","descripcion"])),
-    minutos:n(get(r,["MINUTOS","Minutos","minutos","Suma de Tiempo (Min)"]))
+    volumen:n(get(r,["VOLUMEN_M3","PRODUCCION_REAL","MINUTOS","Suma de VOLUMEN_M3_SSC"]))
   };
 }
 
@@ -796,8 +1338,8 @@ function cumplimientoNumero(v){
 }
 function claseCumplimientoPct(valor){
   const c=cumplimientoNumero(valor);
-  if(c>=100) return "green";
-  if(c>=95) return "yellow";
+  if(c>=95) return "green";
+  if(c>=90) return "yellow";
   return "red";
 }
 
@@ -875,8 +1417,8 @@ function renderResumenEjecutivo(){
   const produccionDia = n(obtenerKpi(kpiGlobal,"TOTAL_GENERAL")) || equipos.reduce((acc,x)=>acc+x.vol,0);
   const capacidadDia = (serieDiaria.length ? n(serieDiaria[serieDiaria.length-1].capacidad) : 0);
   const cumplimiento = capacidadDia>0 ? produccionDia/capacidadDia*100 : 0;
-  const tpMin = tiemposTeam.reduce((acc,x)=>acc+x.minutos,0);
-  const topTp = tiemposTeam[0] || {team:"-",minutos:0};
+  const totalPul = pulpable.reduce((acc,x)=>acc+x.volumen,0);
+  const totalAse = aserrable.reduce((acc,x)=>acc+x.volumen,0);
 
   document.getElementById("mejorTeam").textContent = mejor.team;
   document.getElementById("mejorTeamVol").textContent = fmt(mejor.vol) + " m³ producidos";
@@ -891,8 +1433,8 @@ function renderResumenEjecutivo(){
   card.classList.remove("green","yellow","red","gray");
   card.classList.add(capacidadDia>0 ? claseCumplimientoPct(cumplimiento) : "gray");
 
-  const estadoTxt = cumplimiento>=100 ? "sobre la meta diaria" : cumplimiento>=95 ? "cerca de la meta diaria" : "bajo la meta diaria";
-  document.getElementById("resumenEjecutivo").innerHTML = `📌 <b>Lectura ejecutiva:</b> CEMA NORTE produjo <b>${fmt(produccionDia)} m³</b>, equivalente a <b>${fmt1(cumplimiento)}%</b> de la capacidad diaria (${fmt(capacidadDia)} m³), quedando <b>${estadoTxt}</b>. El mejor desempeño del día fue <b>${mejor.team}</b> y el principal foco por tiempos perdidos fue <b>${topTp.team}</b> con <b>${fmt(topTp.minutos)} min</b>.`;
+  const estadoTxt = cumplimiento>=95 ? "en cumplimiento" : cumplimiento>=90 ? "en atención" : "bajo la meta diaria";
+  document.getElementById("resumenEjecutivo").innerHTML = `📌 <b>Lectura ejecutiva:</b> CEMA NORTE produjo <b>${fmt(produccionDia)} m³</b>, equivalente a <b>${fmt1(cumplimiento)}%</b> de la capacidad diaria (${fmt(capacidadDia)} m³), quedando <b>${estadoTxt}</b>. El mejor desempeño del día fue <b>${mejor.team}</b>. Por producto se informan <b>${fmt(totalPul)} m³ MR Pulpable</b> y <b>${fmt(totalAse)} m³ MSS Aserrable</b>.`;
 }
 
 function renderTeam(){
@@ -973,23 +1515,11 @@ function renderMini(){
   }
 }
 
-function causasTiempos(){
-  const resumen={};
-  tiemposDetalle.forEach(x=>{
-    const causa=t(x.descripcion) || "Sin descripción";
-    if(!resumen[causa]) resumen[causa]=0;
-    resumen[causa]+=n(x.minutos);
-  });
-  return Object.entries(resumen).map(([descripcion,minutos])=>({descripcion,minutos})).sort((a,b)=>b.minutos-a.minutos);
-}
-
 function destruirGraficos(){
   if(emseforChart) emseforChart.destroy();
   if(emseforDonutChart) emseforDonutChart.destroy();
   if(lineChart) lineChart.destroy();
   if(barChart) barChart.destroy();
-  if(tpTeamChart) tpTeamChart.destroy();
-  if(tpCausaChart) tpCausaChart.destroy();
 }
 function renderGraficos(){
   destruirGraficos();
@@ -1098,68 +1628,14 @@ function renderGraficos(){
     ]},
     options:{responsive:true}
   });
-  tpTeamChart=new Chart(document.getElementById("tpTeamChart"),{
-    type:"bar",
-    data:{labels:tiemposTeam.map(x=>x.team),datasets:[{label:"Minutos perdidos",data:tiemposTeam.map(x=>x.minutos),backgroundColor:tiemposTeam.map((_,i)=>colores[i%colores.length]),datalabels:{anchor:"end",align:"top",font:{weight:"bold",size:10},formatter:v=>fmt(v)}}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grace:"15%"}}}
-  });
-  const causas=causasTiempos();
-  const causaCanvas=document.getElementById("tpCausaChart");
-  if(causaCanvas){
-    tpCausaChart=new Chart(causaCanvas,{
-      type:"doughnut",
-      data:{labels:causas.map(x=>x.descripcion),datasets:[{data:causas.map(x=>x.minutos),backgroundColor:causas.map((_,i)=>colores[i%colores.length]),borderColor:"#fff",borderWidth:2}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:"55%",plugins:{legend:{display:false},datalabels:{color:"#fff",font:{weight:"bold",size:11},formatter:(v,ctx)=>{const total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+n(b),0);return total>0?Math.round(v/total*100)+"%":"";}}}}
-    });
-  }
 }
-function renderTiemposPerdidos(){
-  const totalMin=tiemposTeam.reduce((acc,x)=>acc+x.minutos,0);
-  const totalHoras=totalMin/60;
-  const top=tiemposTeam.length>0 ? tiemposTeam[0] : {team:"-",minutos:0};
-  const causas=causasTiempos();
-  const topCausa=causas[0] || {descripcion:"-",minutos:0};
-  const eventos=tiemposDetalle.length;
-  const promedio=eventos>0 ? totalMin/eventos : 0;
-  const concentracion=totalMin>0 ? topCausa.minutos/totalMin*100 : 0;
-
-  document.getElementById("tpMinutos").textContent=fmt(totalMin);
-  document.getElementById("tpHoras").textContent=fmt1(totalHoras);
-  document.getElementById("tpTeamTop").textContent=top.team;
-  document.getElementById("tpTeamTopMin").textContent=fmt(top.minutos)+" min";
-
-  const ev=document.getElementById("tpEventos"); if(ev) ev.textContent=fmt(eventos);
-  const ca=document.getElementById("tpCausas"); if(ca) ca.textContent=fmt(causas.length);
-  const pr=document.getElementById("tpPromedio"); if(pr) pr.textContent=fmt1(promedio)+" min";
-  const co=document.getElementById("tpConcentracion"); if(co) co.textContent=fmt1(concentracion)+"%";
-
-  const alerta=document.getElementById("tpAlerta");
-  if(totalMin>0){
-    alerta.innerHTML=`⚠️ Se registran <b>${fmt(totalMin)} minutos</b> de tiempo perdido, equivalentes a <b>${fmt1(totalHoras)} horas</b>. El team más afectado es <b>${top.team}</b> con <b>${fmt(top.minutos)} min</b>. La causa principal corresponde a <b>${topCausa.descripcion}</b>, con <b>${fmt(topCausa.minutos)} min</b>.`;
-  }else{
-    alerta.innerHTML="Sin tiempos perdidos informados para el día.";
-  }
-
-  const totalCausas=causas.reduce((a,x)=>a+x.minutos,0);
-  const legend=document.getElementById("tpCausaLegend");
-  if(legend){
-    legend.innerHTML=causas.map((x,i)=>{
-      const part=totalCausas>0 ? x.minutos/totalCausas*100 : 0;
-      return `<div class="tp-legend-row"><span class="tp-dot" style="background:${colores[i%colores.length]}"></span><span>${x.descripcion}</span><b>${fmt1(part)}%</b></div>`;
-    }).join("") || `<div class="tp-legend-row"><span></span><span>Sin causas registradas</span><b>0%</b></div>`;
-  }
-
-  document.getElementById("tablaTpDetalle").innerHTML=tiemposDetalle.map(x=>`
-    <tr><td><span class="badge-team">${x.team}</span></td><td>${x.descripcion}</td><td><b>${fmt(x.minutos)}</b></td></tr>
-  `).join("") || `<tr><td colspan="3">Sin detalle de tiempos perdidos.</td></tr>`;
-
-  const tablaCausas=document.getElementById("tablaTpCausas");
-  if(tablaCausas){
-    tablaCausas.innerHTML=causas.map(x=>{
-      const part=totalCausas>0 ? x.minutos/totalCausas*100 : 0;
-      return `<tr><td>${x.descripcion}</td><td><b>${fmt(x.minutos)}</b></td><td>${fmt1(part)}%</td></tr>`;
-    }).join("") || `<tr><td colspan="3">Sin causas registradas.</td></tr>`;
-  }
+function renderProductos(){
+  const totalPul=pulpable.reduce((a,x)=>a+x.volumen,0);
+  const totalAse=aserrable.reduce((a,x)=>a+x.volumen,0);
+  document.getElementById("totalPulpable").textContent=fmt1(totalPul)+" m³";
+  document.getElementById("totalAserrable").textContent=fmt1(totalAse)+" m³";
+  document.getElementById("tablaPulpable").innerHTML=pulpable.map(x=>`<tr><td><span class="badge-team">${x.team}</span></td><td><b>${fmt1(x.volumen)}</b></td></tr>`).join("") || `<tr><td colspan="2">Sin producción MR Pulpable.</td></tr>`;
+  document.getElementById("tablaAserrable").innerHTML=aserrable.map(x=>`<tr><td>${x.emsefor}</td><td><span class="badge-team">${x.team}</span></td><td><b>${fmt1(x.volumen)}</b></td></tr>`).join("") || `<tr><td colspan="3">Sin producción MSS Aserrable.</td></tr>`;
 }
 function renderLista(id,data,tituloKeys,textoKeys,estadoKeys){
   const el=document.getElementById(id);
@@ -1184,13 +1660,13 @@ function cargarDatos(data){
   emseforData=(data.emsefor || data.T_EMSEFOR || []).map(mapEmsefor).filter(x=>x.emsefor);
   acumulado=(data.acumulado || data.T_ACUMULADO || []).map(mapAcum).filter(x=>x.team);
   serieDiaria=(data.serie_diaria || data.T_SERIE_DIARIA || []).map(mapSerie).filter(x=>x.fecha || x.team);
-  tiemposTeam=(data.tiempos_team || data.T_TP_TEAM || []).map(mapTpTeam).filter(x=>x.team);
-  tiemposDetalle=(data.tiempos_detalle || data.T_TP_DETALLE || []).map(mapTpDetalle).filter(x=>x.team);
+  pulpable=(data.pulpable || data.tiempos_team || data.T_TP_TEAM || []).map(mapPulpable).filter(x=>x.team);
+  aserrable=(data.aserrable || data.tiempos_detalle || data.T_TP_DETALLE || []).map(mapAserrable).filter(x=>x.team);
   equipos.sort((a,b)=>a.emsefor.localeCompare(b.emsefor,"es") || a.team.localeCompare(b.team,"es",{numeric:true}));
   emseforData.sort((a,b)=>b.vol-a.vol);
   acumulado.sort((a,b)=>a.team.localeCompare(b.team,"es",{numeric:true}));
-  tiemposTeam.sort((a,b)=>b.minutos-a.minutos);
-  tiemposDetalle.sort((a,b)=>b.minutos-a.minutos);
+  pulpable.sort((a,b)=>b.volumen-a.volumen);
+  aserrable.sort((a,b)=>b.volumen-a.volumen);
   if(emseforData.length===0 && equipos.length>0){
     const resumen={};
     equipos.forEach(x=>{ if(!resumen[x.emsefor]) resumen[x.emsefor]=0; resumen[x.emsefor]+=x.vol; });
@@ -1201,13 +1677,8 @@ function cargarDatos(data){
   renderTeam();
   renderAcum();
   renderMini();
-  renderTiemposPerdidos();
+  renderProductos();
   renderGraficos();
-  renderLista("equiposDetenidos",data.equipos_detenidos || data.T_EQUIPOS_DETENIDOS || [],["EQUIPO","Equipo","TEAM","Team"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
-  renderLista("quiebres",data.quiebres || data.T_QUIEBRES || [],["QUIEBRE","Quiebre","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
-  renderLista("predios",data.predios || data.T_PREDIOS_RELEVANTES || [],["PREDIO","Predio","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
-  renderLista("hallazgos",data.hallazgos || data.T_HALLAZGOS || [],["HALLAZGO","Hallazgo","TITULO","Título"],["DETALLE","Detalle","COMENTARIO","Comentario"],["ESTADO","Estado"]);
-  renderLista("compromisos",data.compromisos || data.T_COMPROMISOS || [],["COMPROMISO","Compromiso","TITULO","Título"],["DETALLE","Detalle","RESPONSABLE","Responsable"],["ESTADO","Estado"]);
 }
 function mensaje(txt){
   const box=document.getElementById("mensaje");
@@ -1262,22 +1733,127 @@ document.getElementById("ordenTabla").onchange=renderTeam;
 document.getElementById("buscar").oninput=function(){renderTeam();renderAcum();};
 
 
+function aplicarFormatoGraficoImpresion(){
+  /* En PDF el acumulado se resume por Emsefor. El detalle por Team permanece
+     en la tabla final, mientras el gráfico ejecutivo queda limpio. */
+  if(barChart){
+    const barras=barChart.data.datasets[0];
+    const linea=barChart.data.datasets[1];
+
+    const emData=emseforOrdenado();
+    barChart.data.labels=emData.map(x=>x.emsefor);
+
+    barras.order=1;
+    barras.type="bar";
+    barras.label="Volumen día";
+    barras.data=emData.map(x=>x.vol);
+    barras.backgroundColor=emData.map((_,i)=>colores[i%colores.length]);
+    barras.borderColor="transparent";
+    barras.borderWidth=0;
+    barras.borderRadius=2;
+    barras.maxBarThickness=18;
+    barras.datalabels={
+      anchor:"end",align:"right",offset:3,clip:false,color:"#4f4942",
+      font:{family:"Arial",weight:"700",size:9},formatter:v=>fmt(v)
+    };
+
+    linea.order=1;
+    linea.type="bar";
+    linea.label="Meta diaria";
+    linea.data=emData.map(x=>x.meta);
+    linea.backgroundColor="#DFD1A7";
+    linea.borderColor="#c6b57f";
+    linea.borderWidth=1;
+    linea.borderRadius=2;
+    linea.maxBarThickness=18;
+    linea.datalabels={
+      align:"right",anchor:"end",offset:3,clip:false,color:"#786f62",
+      font:{family:"Arial",weight:"700",size:9},formatter:v=>fmt(v)
+    };
+
+    const titulo=document.querySelector(".accumulated-chart-card h2");
+    if(titulo) titulo.textContent="Volumen y meta diaria por Emsefor";
+
+    barChart.options.indexAxis="y";
+    barChart.options.maintainAspectRatio=false;
+    barChart.options.animation=false;
+    barChart.options.layout={padding:{top:10,right:46,bottom:4,left:6}};
+    barChart.options.plugins.legend={
+      display:true,position:"top",align:"center",
+      labels:{font:{family:"Arial",size:10},padding:18,boxWidth:30,boxHeight:10,usePointStyle:false}
+    };
+    barChart.options.plugins.datalabels={clip:false,clamp:true};
+    barChart.options.scales={
+      x:{beginAtZero:true,grace:"14%",ticks:{font:{family:"Arial",size:8.5}},grid:{color:"rgba(105,97,88,.14)"}},
+      y:{ticks:{autoSkip:false,font:{family:"Arial",size:9}},grid:{display:false}}
+    };
+    barChart.update("none");
+  }
+
+  /* El gráfico de tendencia usa todo el ancho de la página. De esta forma
+     no se estira verticalmente ni comprime las fechas y leyendas. */
+  if(lineChart){
+    lineChart.options.maintainAspectRatio=false;
+    lineChart.options.animation=false;
+    lineChart.options.layout={padding:{top:4,right:18,bottom:2,left:4}};
+    lineChart.options.plugins.legend={
+      display:true,position:"top",align:"center",
+      labels:{font:{family:"Arial",size:9},padding:14,boxWidth:22,boxHeight:8}
+    };
+    if(lineChart.options.scales){
+      Object.values(lineChart.options.scales).forEach(escala=>{
+        escala.ticks={...(escala.ticks||{}),font:{family:"Arial",size:8.5}};
+      });
+    }
+    lineChart.update("none");
+  }
+
+  /* El donut se redibuja más grande. Todos los porcentajes quedan dentro
+     del gráfico y el valor exacto permanece además en la leyenda. */
+  if(emseforDonutChart){
+    emseforDonutChart.options.maintainAspectRatio=false;
+    emseforDonutChart.options.animation=false;
+    emseforDonutChart.options.cutout="48%";
+    emseforDonutChart.options.layout={padding:5};
+    emseforDonutChart.options.plugins.datalabels={
+      display:true,color:"#fff",anchor:"center",align:"center",clamp:true,clip:false,
+      textStrokeColor:"rgba(0,0,0,.28)",textStrokeWidth:1,
+      font:ctx=>{
+        const ds=ctx.chart.data.datasets[0].data;
+        const total=ds.reduce((a,b)=>a+n(b),0);
+        const part=total? n(ds[ctx.dataIndex])/total*100:0;
+        return {family:"Arial",weight:"700",size:part<4?7:10};
+      },
+      formatter:(v,ctx)=>{
+        const total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+n(b),0);
+        return total>0?fmt1(v/total*100)+"%":"";
+      }
+    };
+    emseforDonutChart.update("none");
+  }
+}
+
 function redimensionarGraficosParaImpresion(){
-  [emseforChart,emseforDonutChart,lineChart,barChart,tpTeamChart,tpCausaChart].forEach(g=>{
+  [emseforChart,emseforDonutChart,lineChart,barChart].forEach(g=>{
     if(g && typeof g.resize === "function") g.resize();
   });
 }
 
 window.addEventListener("beforeprint", ()=>{
+  aplicarFormatoGraficoImpresion();
   redimensionarGraficosParaImpresion();
 });
 window.addEventListener("afterprint", ()=>{
-  redimensionarGraficosParaImpresion();
+  /* Recupera exactamente el aspecto interactivo normal del HTML. */
+  const titulo=document.querySelector(".accumulated-chart-card h2");
+  if(titulo) titulo.textContent="Volumen acumulado por Team";
+  renderGraficos();
 });
 
 function generarPDF(){
+  aplicarFormatoGraficoImpresion();
   redimensionarGraficosParaImpresion();
-  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>window.print())));
 }
 
 const script=document.createElement("script");
@@ -1290,7 +1866,7 @@ script.onload=function(){
   }
 };
 script.onerror=function(){
-  mensaje("No se encontró datos.js. Ejecuta la macro 'Generar_Reporte_HTML_Completo'.");
+  mensaje("No se encontró datos.js. Ejecuta el paso 4: GENERAR DATOS.JS / HTML.");
 };
 document.body.appendChild(script);
 </script>
